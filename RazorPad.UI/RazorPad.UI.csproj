@@ -35,11 +35,16 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="ScintillaNET">
+      <HintPath>..\packages\ScintillaNET v2.5\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModelProviders\Json\JsonModelBuilder.xaml.cs">
@@ -48,7 +53,9 @@
     <Compile Include="Wpf\BrowseBehavior.cs" />
     <Compile Include="Wpf\CommandSink.cs" />
     <Compile Include="Wpf\CommandSinkBinding.cs" />
-    <Compile Include="Wpf\DelayedNotifyPropertyChangedTextBox.cs" />
+    <Compile Include="Wpf\DelayedNotifyPropertyChangedTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Wpf\ICommandSink.cs" />
     <Compile Include="Util\InMemoryTextWriter.cs" />
     <Compile Include="ModelProviders\ModelBuilder.cs" />

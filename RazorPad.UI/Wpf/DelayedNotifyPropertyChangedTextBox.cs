@@ -2,10 +2,11 @@
 using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using ScintillaNET;
 
 namespace RazorPad.UI.Wpf
 {
-    public class DelayedNotifyPropertyChangedTextBox : TextBox
+    public class DelayedNotifyPropertyChangedTextBox : Scintilla
     {
         public static readonly int DefaultTextChangedEventDelay = (int)TimeSpan.FromSeconds(.5).TotalMilliseconds;
 
@@ -24,23 +25,24 @@ namespace RazorPad.UI.Wpf
             TextChanged += OnTextChanged;
         }
 
+
         private void InitializeTextChangedTimer()
         {
             _textChangedTimer.Elapsed += (x, y) =>
             {
-                var bindingExpression = GetBindingExpression(TextProperty);
+				//var bindingExpression = GetBindingExpression(TextProperty);
 
-                if(bindingExpression != null)
-                {
-                    Dispatcher.BeginInvoke(DispatcherPriority.DataBind, 
-                        new Action(bindingExpression.UpdateSource));
-                }
+				//if(bindingExpression != null)
+				//{
+				//	Dispatcher.BeginInvoke(DispatcherPriority.DataBind, 
+				//		new Action(bindingExpression.UpdateSource));
+				//}
 
                 _textChangedTimer.Stop();
             };
         }
 
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
+		private void OnTextChanged(object sender, EventArgs e)
         {
             if (_textChangedTimer.Enabled)
                 _textChangedTimer.Stop();
