@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Threading;
+using ICSharpCode.AvalonEdit.Editing;
+using ICSharpCode.AvalonEdit.Folding;
+using ICSharpCode.AvalonEdit.Indentation.CSharp;
+using RazorPad.UI.AvalonEdit;
 using RazorPad.ViewModels;
 using TextBox = System.Windows.Controls.TextBox;
 using UserControl = System.Windows.Controls.UserControl;
@@ -14,7 +19,6 @@ namespace RazorPad.Views
     {
         private static readonly int TemplateTextChangedEventDelay = (int)TimeSpan.FromSeconds(.5).TotalMilliseconds;
 
-
         Timer _templateTextChangedTimer;
 
         protected RazorTemplateEditorViewModel ViewModel
@@ -26,7 +30,49 @@ namespace RazorPad.Views
         {
             InitializeComponent();
             InitializeTemplateTextChangedTimer();
+
+            InitializeAvalonEditor();
+
+            
         }
+
+
+        protected void InitializeAvalonEditor()
+        {
+            textEditor.TextArea.IndentationStrategy = new CSharpIndentationStrategy(textEditor.Options);
+            textEditor.ShowLineNumbers = true;
+
+            InitializeFolding();
+        }
+
+
+        #region Folding
+
+
+        FoldingManager _foldingManager;
+        AbstractFoldingStrategy _foldingStrategy;
+
+        protected void InitializeFolding()
+        {
+            _foldingStrategy = new BraceFoldingStrategy();
+            _foldingManager = FoldingManager.Install(textEditor.TextArea);
+            _foldingStrategy.UpdateFoldings(_foldingManager, textEditor.Document);
+
+            var foldingUpdateTimer = new DispatcherTimer();
+            foldingUpdateTimer.Interval = TimeSpan.FromSeconds(2);
+            foldingUpdateTimer.Tick += FoldingUpdateTimerTick;
+            foldingUpdateTimer.Start();
+        }
+
+        void FoldingUpdateTimerTick(object sender, EventArgs e)
+        {
+            if (_foldingStrategy != null)
+            {
+                _foldingStrategy.UpdateFoldings(_foldingManager, textEditor.Document);
+            }
+        }
+
+        #endregion
 
         private void InitializeTemplateTextChangedTimer()
         {
@@ -34,9 +80,9 @@ namespace RazorPad.Views
 
             _templateTextChangedTimer.Tick += (x, y) =>
             {
-                TemplateTextBox
-                    .GetBindingExpression(TextBox.TextProperty)
-                    .UpdateSource();
+                //textEditor
+                //    .GetBindingExpression(textEditor.Text.TextProperty)
+                //    .UpdateSource();
 
                 _templateTextChangedTimer.Stop();
             };

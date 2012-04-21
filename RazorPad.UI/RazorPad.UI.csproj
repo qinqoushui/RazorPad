@@ -32,12 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.AvalonEdit">
+      <HintPath>..\packages\AvalonEdit.4.1.0.8000\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ScintillaNET">
-      <HintPath>..\packages\ScintillaNET v2.5\ScintillaNET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
@@ -46,15 +46,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AvalonEdit\BraceFoldingStrategy.cs" />
     <Compile Include="ModelProviders\Json\JsonModelBuilder.xaml.cs">
       <DependentUpon>JsonModelBuilder.xaml</DependentUpon>
     </Compile>
     <Compile Include="Wpf\BrowseBehavior.cs" />
     <Compile Include="Wpf\CommandSink.cs" />
     <Compile Include="Wpf\CommandSinkBinding.cs" />
-    <Compile Include="Wpf\DelayedNotifyPropertyChangedTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Wpf\DelayedNotifyPropertyChangedTextBox.cs" />
     <Compile Include="Wpf\ICommandSink.cs" />
     <Compile Include="Util\InMemoryTextWriter.cs" />
     <Compile Include="ModelProviders\ModelBuilder.cs" />
@@ -73,6 +72,9 @@
       <Project>{511D144C-F4C7-40A3-B3B4-80D891FCE2F5}</Project>
       <Name>RazorPad.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

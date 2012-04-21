@@ -1,11 +1,13 @@
 ﻿<UserControl x:Class="RazorPad.Views.RazorTemplateEditor"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:RazorPadExt="clr-namespace:RazorPad.UI.Wpf;assembly=RazorPad.UI">
 
-    <wfi:WindowsFormsHost x:Name="FormsHost" AllowDrop="True">
-        <RazorPadExt:DelayedNotifyPropertyChangedTextBox x:Name="TemplateTextBox" />
-    </wfi:WindowsFormsHost>
+    
+    <RazorPadExt:DelayedNotifyPropertyChangedTextEditor 
+        Name="textEditor" FontFamily="Consolas"
+        SyntaxHighlighting="C#"
+        FontSize="10pt" />
+    
 
 </UserControl>

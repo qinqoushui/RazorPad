@@ -44,9 +44,7 @@
                     <TabControl Grid.Row="0" ItemsSource="{Binding TemplateEditors}" SelectedValue="{Binding CurrentTemplate}">
                         <TabControl.ContentTemplate>
                             <DataTemplate>
-                                <ScrollViewer Grid.Row="0">
-                                    <Views:RazorTemplateEditor />
-                                </ScrollViewer>
+                                <Views:RazorTemplateEditor />
                             </DataTemplate>
                         </TabControl.ContentTemplate>
                         <TabControl.ItemTemplate>
@@ -55,17 +53,17 @@
                             </DataTemplate>
                         </TabControl.ItemTemplate>
                     </TabControl>
-                    
+
                 </Grid>
 
                 <GridSplitter Grid.Row="1" ResizeDirection="Rows" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" />
 
                 <TabControl Grid.Row="2" DataContext="{Binding CurrentTemplate}">
-                    
+
                     <TabItem x:Name="BrowserTab" Header="Browser View">
                         <WebBrowser AttachedProperties:BrowseBehavior.Html="{Binding ExecutedTemplateOutput}" />
                     </TabItem>
-                    
+
                     <TabItem x:Name="OutputTab" Header="Source View">
                         <ScrollViewer>
                             <TextBox Text="{Binding ExecutedTemplateOutput}" 
@@ -73,13 +71,13 @@
                             />
                         </ScrollViewer>
                     </TabItem>
-                    
+
                     <TabItem x:Name="CodeTab" Header="Generated Code">
                         <ScrollViewer>
                             <TextBox Text="{Binding GeneratedTemplateCode}" IsReadOnly="True" />
                         </ScrollViewer>
                     </TabItem>
-                    
+
                 </TabControl>
             </Grid>
 

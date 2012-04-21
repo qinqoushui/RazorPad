@@ -2,11 +2,15 @@
 using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using ScintillaNET;
+using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Folding;
+using ICSharpCode.AvalonEdit.Indentation.CSharp;
+using RazorPad.UI.AvalonEdit;
 
 namespace RazorPad.UI.Wpf
 {
-    public class DelayedNotifyPropertyChangedTextBox : Scintilla
+    public class DelayedNotifyPropertyChangedTextEditor : TextEditor
     {
         public static readonly int DefaultTextChangedEventDelay = (int)TimeSpan.FromSeconds(.5).TotalMilliseconds;
 
@@ -18,35 +22,34 @@ namespace RazorPad.UI.Wpf
             set { _textChangedTimer.Interval = value; }
         }
 
-        public DelayedNotifyPropertyChangedTextBox()
+        public DelayedNotifyPropertyChangedTextEditor()
         {
             _textChangedTimer = new Timer { Interval = DefaultTextChangedEventDelay };
             InitializeTextChangedTimer();
             TextChanged += OnTextChanged;
         }
 
-
         private void InitializeTextChangedTimer()
         {
             _textChangedTimer.Elapsed += (x, y) =>
             {
-				//var bindingExpression = GetBindingExpression(TextProperty);
+                var bindingExpression = GetBindingExpression(DocumentProperty);
 
-				//if(bindingExpression != null)
-				//{
-				//	Dispatcher.BeginInvoke(DispatcherPriority.DataBind, 
-				//		new Action(bindingExpression.UpdateSource));
-				//}
+                if (bindingExpression != null)
+                {
+                    Dispatcher.BeginInvoke(DispatcherPriority.DataBind,
+                        new Action(bindingExpression.UpdateSource));
+                }
 
                 _textChangedTimer.Stop();
             };
         }
 
-		private void OnTextChanged(object sender, EventArgs e)
+        private void OnTextChanged(object sender, EventArgs e)
         {
             if (_textChangedTimer.Enabled)
                 _textChangedTimer.Stop();
-            
+
             _textChangedTimer.Start();
         }
     }
