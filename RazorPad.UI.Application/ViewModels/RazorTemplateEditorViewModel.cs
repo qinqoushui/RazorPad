@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Razor;
-using ICSharpCode.AvalonEdit.Document;
 using RazorPad.Compilation;
 using RazorPad.Framework;
 using RazorPad.Persistence;
@@ -26,7 +25,7 @@ namespace RazorPad.ViewModels
             {
                 if (string.IsNullOrWhiteSpace(Filename))
                     return "New File";
-
+                
                 return new FileInfo(Filename).Name;
             }
         }
@@ -49,7 +48,7 @@ namespace RazorPad.ViewModels
 
                 if (value != null && ModelProvider == null && _modelBuilder.ModelProvider != null)
                     ModelProvider = _modelBuilder.ModelProvider;
-
+                
                 OnPropertyChanged("ModelBuilder");
             }
         }
@@ -69,7 +68,7 @@ namespace RazorPad.ViewModels
                 if (value != null)
                     value.ModelChanged += TriggerRefresh;
 
-                if (ModelBuilder != null)
+                if(ModelBuilder != null)
                     ModelBuilder.ModelProvider = value;
 
                 _modelProvider = value;
@@ -187,8 +186,8 @@ namespace RazorPad.ViewModels
         {
             _documentLoader = documentLoader ?? new RazorDocumentLoader();
             TemplateCompiler = new TemplateCompiler();
-            
-            if (!string.IsNullOrWhiteSpace(filename))
+
+            if(!string.IsNullOrWhiteSpace(filename))
                 LoadFromFile(filename);
 
             Execute();
@@ -204,7 +203,7 @@ namespace RazorPad.ViewModels
             using (StringWriter writer = new StringWriter())
             {
                 GeneratorResults = TemplateCompiler.GenerateCode(TemplateText, writer);
-
+                
                 var generatedCode = writer.ToString();
                 generatedCode = Regex.Replace(generatedCode, "//.*", string.Empty);
                 generatedCode = Regex.Replace(generatedCode, "#.*", string.Empty);
@@ -265,7 +264,6 @@ namespace RazorPad.ViewModels
                 Filename = document.Filename;
                 ModelBuilder = new JsonModelBuilder { ModelProvider = document.ModelProvider };
                 TemplateText = document.Template;
-                TextDocument = new TextDocument(TemplateText);
                 ModelProvider.TriggerModelChanged();
             }
             catch (Exception ex)
@@ -274,8 +272,6 @@ namespace RazorPad.ViewModels
                 UpdateStatus(ex.Message);
             }
         }
-
-        protected TextDocument TextDocument { get; set; }
 
         public void SaveToFile(string fileName = null)
         {
