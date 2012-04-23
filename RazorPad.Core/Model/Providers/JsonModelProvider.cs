@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Script.Serialization;
+using ICSharpCode.AvalonEdit.Document;
 
 namespace RazorPad.Providers
 {
@@ -23,6 +24,19 @@ namespace RazorPad.Providers
             : base(modelType)
         {
             Json = json;
+
+            if (!string.IsNullOrWhiteSpace(json))
+                JsonDocument = new TextDocument(json);
+            else
+            {
+                JsonDocument = new TextDocument();
+            }
+        }
+
+        protected TextDocument JsonDocument
+        {
+            get;
+            set;
         }
 
         protected override dynamic RebuildModel()

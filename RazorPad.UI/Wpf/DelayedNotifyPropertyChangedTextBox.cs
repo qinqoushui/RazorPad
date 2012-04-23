@@ -27,6 +27,7 @@ namespace RazorPad.UI.Wpf
             _textChangedTimer = new Timer { Interval = DefaultTextChangedEventDelay };
             InitializeTextChangedTimer();
             TextChanged += OnTextChanged;
+            Document = new TextDocument(); 
         }
 
         private void InitializeTextChangedTimer()
