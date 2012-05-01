@@ -10,7 +10,7 @@ using RazorPad.UI.AvalonEdit;
 
 namespace RazorPad.UI.Wpf
 {
-    public class DelayedNotifyPropertyChangedTextEditor : TextEditor
+    public class DelayedNotifyPropertyChangedTextBox : TextBox
     {
         public static readonly int DefaultTextChangedEventDelay = (int)TimeSpan.FromSeconds(.5).TotalMilliseconds;
 
@@ -22,19 +22,18 @@ namespace RazorPad.UI.Wpf
             set { _textChangedTimer.Interval = value; }
         }
 
-        public DelayedNotifyPropertyChangedTextEditor()
+        public DelayedNotifyPropertyChangedTextBox()
         {
             _textChangedTimer = new Timer { Interval = DefaultTextChangedEventDelay };
             InitializeTextChangedTimer();
             TextChanged += OnTextChanged;
-            Document = new TextDocument(); 
         }
 
         private void InitializeTextChangedTimer()
         {
             _textChangedTimer.Elapsed += (x, y) =>
             {
-                var bindingExpression = GetBindingExpression(DocumentProperty);
+                var bindingExpression = GetBindingExpression(TextProperty);
 
                 if (bindingExpression != null)
                 {
