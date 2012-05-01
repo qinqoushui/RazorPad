@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.ComponentModel.Composition;
 using System.Web.Script.Serialization;
 using ICSharpCode.AvalonEdit.Document;
 
@@ -20,8 +20,7 @@ namespace RazorPad.Providers
         }
         private string _json;
 
-        public JsonModelProvider(Type modelType = null, string json = null)
-            : base(modelType)
+        public JsonModelProvider(string json = null)
         {
             Json = json;
 
@@ -39,17 +38,32 @@ namespace RazorPad.Providers
             set;
         }
 
+        public override string Serialize()
+        {
+            return Json;
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            Json = serialized;
+        }
+
         protected override dynamic RebuildModel()
         {
             var serializer = new JavaScriptSerializer();
 
             var json = (string.IsNullOrWhiteSpace(Json)) ? "{}" : Json;
-            var modelType = ModelType ?? typeof (object);
+            return serializer.DeserializeObject(json);
+        }
 
-            if (modelType == typeof(object))
-                return serializer.DeserializeObject(json);
-            else
-                return serializer.Deserialize(json, modelType);
+
+        [Export(typeof(IModelProviderFactory))]
+        public class JsonModelProviderFactory : IModelProviderFactory
+        {
+            public IModelProvider Create(dynamic model = null)
+            {
+                return new JsonModelProvider(json: model);
+            }
         }
     }
 }

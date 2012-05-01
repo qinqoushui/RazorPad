@@ -1,19 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web.Razor;
 using RazorPad.Compilation;
 using RazorPad.Framework;
-using RazorPad.Persistence;
 using RazorPad.UI;
-using RazorPad.UI.Json;
+using RazorPad.UI.ModelBuilders;
 
 namespace RazorPad.ViewModels
 {
     public class RazorTemplateEditorViewModel : ViewModelBase
     {
-        private readonly RazorDocumentLoader _documentLoader;
+        private readonly ModelProviders _modelProviderFactory;
+        private readonly ModelBuilders _modelBuilderFactory;
+        private readonly RazorDocument _document;
+        private readonly IDictionary<Type, string> _savedModels;
 
         public ITemplateCompiler TemplateCompiler { get; set; }
 
@@ -30,74 +37,47 @@ namespace RazorPad.ViewModels
             }
         }
 
-        public TemplateCompilationParameters TemplateCompilationParameters
+        public RazorDocument Document
         {
-            get
-            {
-                return TemplateCompiler == null ? null : TemplateCompiler.CompilationParameters;
-            }
+            get { return _document; }
         }
 
+        public string SelectedModelProvider
+        {
+            get { return _selectedModelProvider; }
+            set
+            {
+                if (_selectedModelProvider == value)
+                    return;
+
+                _selectedModelProvider = value;
+                OnPropertyChanged("SelectedModelProvider");
+
+                UpdateModelProvider(value);
+            }
+        }
+        private string _selectedModelProvider;
+
+        public ObservableCollection<string> AvailableModelProviders { get; set; }
 
         public ModelBuilder ModelBuilder
         {
-            get { return _modelBuilder; }
-            set
-            {
-                _modelBuilder = value;
-
-                if (value != null && ModelProvider == null && _modelBuilder.ModelProvider != null)
-                    ModelProvider = _modelBuilder.ModelProvider;
-                
-                OnPropertyChanged("ModelBuilder");
-            }
+            get { return _modelBuilderFactory.Create(_document.ModelProvider); }
         }
-        private ModelBuilder _modelBuilder;
 
-        public IModelProvider ModelProvider
+        public InMemoryTextWriter Messages
         {
-            get { return _modelProvider; }
+            get { return _messages; }
             set
             {
-                if (_modelProvider == value)
+                if (_messages == value)
                     return;
 
-                if (_modelProvider != null)
-                    _modelProvider.ModelChanged -= TriggerRefresh;
-
-                if (value != null)
-                    value.ModelChanged += TriggerRefresh;
-
-                if(ModelBuilder != null)
-                    ModelBuilder.ModelProvider = value;
-
-                _modelProvider = value;
-
-                OnPropertyChanged("ModelProvider");
+                _messages = value;
+                OnPropertyChanged("Messages");
             }
         }
-        private IModelProvider _modelProvider;
-
-        public TextWriter ErrorMessages
-        {
-            get { return _errorMessages = _errorMessages ?? Console.Error; }
-            set { _errorMessages = value; }
-        }
-        private TextWriter _errorMessages;
-
-        public string ExecutedTemplateInput
-        {
-            get { return _executedTemplateInput; }
-            set
-            {
-                if (_executedTemplateInput == value)
-                    return;
-
-                _executedTemplateInput = value;
-                OnPropertyChanged("ExecutedTemplateInput");
-            }
-        }
-        private string _executedTemplateInput;
+        private InMemoryTextWriter _messages;
 
         public string ExecutedTemplateOutput
         {
@@ -115,17 +95,16 @@ namespace RazorPad.ViewModels
 
         public string Filename
         {
-            get { return _filename; }
+            get { return _document.Filename; }
             set
             {
-                if (_filename == value)
+                if (_document.Filename == value)
                     return;
 
-                _filename = value;
+                _document.Filename = value;
                 OnPropertyChanged("Filename");
             }
         }
-        private string _filename;
 
         public string GeneratedTemplateCode
         {
@@ -155,20 +134,19 @@ namespace RazorPad.ViewModels
         }
         private GeneratorResults _generatorResults;
 
-        public string TemplateText
+        public string Template
         {
-            get { return _templateText; }
+            get { return _document.Template; }
             set
             {
-                if (_templateText == value)
+                if (_document.Template == value)
                     return;
 
-                _templateText = value;
-                OnPropertyChanged("TemplateText");
+                _document.Template = value;
+                OnPropertyChanged("Template");
                 Refresh();
             }
         }
-        private string _templateText;
 
         public bool CanSaveToCurrentlyLoadedFile
         {
@@ -181,16 +159,25 @@ namespace RazorPad.ViewModels
         }
 
 
-
-        public RazorTemplateEditorViewModel(string filename = null, RazorDocumentLoader documentLoader = null)
+        public RazorTemplateEditorViewModel(RazorDocument document = null, ModelBuilders modelBuilderFactory = null, ModelProviders modelProviders = null)
         {
-            _documentLoader = documentLoader ?? new RazorDocumentLoader();
+            _document = document ?? new RazorDocument();
+            _modelBuilderFactory = modelBuilderFactory ?? ModelBuilders.Current;
+            _modelProviderFactory = modelProviders ?? ModelProviders.Current;
+            _savedModels = new Dictionary<Type, string>();
+
+            var modelProviderNames = _modelProviderFactory.Providers.Select(x => (string) new ModelProviderFactoryName(x.Value));
+            AvailableModelProviders = new ObservableCollection<string>(modelProviderNames);
+            _selectedModelProvider = new ModelProviderName(_document.ModelProvider);
+
+            Messages = new InMemoryTextWriter();
             TemplateCompiler = new TemplateCompiler();
 
-            if(!string.IsNullOrWhiteSpace(filename))
-                LoadFromFile(filename);
+            // TODO: Replace with real logging
+            Trace.Listeners.Add(new TextWriterTraceListener(Messages));
 
-            Execute();
+            if (_document.ModelProvider != null)
+                _document.ModelProvider.ModelChanged += (sender, args) => Refresh();
         }
 
 
@@ -200,9 +187,9 @@ namespace RazorPad.ViewModels
 
             GeneratedTemplateCode = string.Empty;
 
-            using (StringWriter writer = new StringWriter())
+            using (var writer = new StringWriter())
             {
-                GeneratorResults = TemplateCompiler.GenerateCode(TemplateText, writer);
+                GeneratorResults = TemplateCompiler.GenerateCode(_document, writer);
                 
                 var generatedCode = writer.ToString();
                 generatedCode = Regex.Replace(generatedCode, "//.*", string.Empty);
@@ -219,7 +206,8 @@ namespace RazorPad.ViewModels
             {
                 UpdateStatus("Template parsing failed!");
 
-                ErrorMessages.WriteLine("***  Template Parsing Failed  ***");
+                Log("***  Template Parsing Failed  ***");
+
                 if (GeneratorResults != null)
                 {
                     var errorBuilder = new StringBuilder();
@@ -229,7 +217,7 @@ namespace RazorPad.ViewModels
                     }
 
                     var errors = errorBuilder.ToString();
-                    ErrorMessages.WriteLine(errors);
+                    Log(errors);
                     ExecutedTemplateOutput = errors;
                 }
             }
@@ -237,69 +225,26 @@ namespace RazorPad.ViewModels
 
         public void Execute()
         {
-            UpdateStatus("Parsing template...");
-            Parse();
+            Messages.Flush();
 
             try
             {
-                UpdateStatus("Retrieving model...");
-                var model = ModelProvider.GetModel();
+                new TaskFactory().StartNew(() => {
+                    Log("Parsing template...");
+                    Parse();
 
-                UpdateStatus("Executing template...");
-                ExecutedTemplateOutput = TemplateCompiler.Execute(TemplateText, model);
-                UpdateStatus("Success!");
+                    Log("Executing template...");
+                    ExecutedTemplateOutput = TemplateCompiler.Execute(_document);
+                    Log("Success!");
+
+                    UpdateStatus("Success!");
+                });
             }
             catch (Exception ex)
             {
-                ErrorMessages.WriteLine(ex);
+                Log(ex);
                 UpdateStatus(ex.Message);
             }
-        }
-
-        public void LoadFromFile(string fileName)
-        {
-            try
-            {
-                var document = _documentLoader.Load(fileName);
-                Filename = document.Filename;
-                ModelBuilder = new JsonModelBuilder { ModelProvider = document.ModelProvider };
-                TemplateText = document.Template;
-                ModelProvider.TriggerModelChanged();
-            }
-            catch (Exception ex)
-            {
-                ErrorMessages.WriteLine(ex);
-                UpdateStatus(ex.Message);
-            }
-        }
-
-        public void SaveToFile(string fileName = null)
-        {
-            var targetFilename = fileName ?? Filename;
-
-            try
-            {
-                if (string.IsNullOrWhiteSpace(targetFilename))
-                    throw new ApplicationException("No filename specified!");
-
-                if (targetFilename.EndsWith(".razorpad", StringComparison.OrdinalIgnoreCase))
-                    throw new NotImplementedException("Saving .razorpad documents has not been implemented yet -- coming soon!");
-
-                Filename = targetFilename;
-
-                using (var writer = new StreamWriter(File.OpenWrite(Filename)))
-                    writer.Write(TemplateText);
-            }
-            catch (Exception ex)
-            {
-                ErrorMessages.WriteLine(ex);
-                UpdateStatus(ex.Message);
-            }
-        }
-
-        private void UpdateStatus(string statusMessage)
-        {
-            OnStatusUpdated.SafeInvoke(statusMessage);
         }
 
         public void Refresh()
@@ -307,9 +252,52 @@ namespace RazorPad.ViewModels
             Execute();
         }
 
-        private void TriggerRefresh(object sender, EventArgs args)
+        private void OnModelChanged(object sender, EventArgs args)
         {
             Refresh();
+        }
+
+        private void Log(string message)
+        {
+            Messages.WriteLine("[{0}]  {1}", DateTime.Now.ToShortTimeString(), message);
+        }
+
+        private void Log(Exception ex)
+        {
+            Messages.WriteLine("[{0}]  {1}\r\n{2}", DateTime.Now.ToShortTimeString(), ex.Message, ex.StackTrace);
+        }
+
+        private void UpdateModelProvider(string providerName)
+        {
+            var newModelProvider = _modelProviderFactory.Create(providerName);
+            UpdateModelProvider(newModelProvider);
+        }
+
+        private void UpdateModelProvider(IModelProvider newModelProvider)
+        {
+            var oldModelProvider = _document.ModelProvider;
+
+            if (oldModelProvider != null)
+            {
+                _savedModels[oldModelProvider.GetType()] = oldModelProvider.Serialize();
+                oldModelProvider.ModelChanged -= OnModelChanged;
+            }
+
+            _document.ModelProvider = newModelProvider;
+            newModelProvider.ModelChanged += OnModelChanged;
+
+            OnPropertyChanged("ModelBuilder");
+
+            string currentlySavedModel;
+            if (newModelProvider != null && _savedModels.TryGetValue(newModelProvider.GetType(), out currentlySavedModel))
+            {
+                newModelProvider.Deserialize(currentlySavedModel);
+            }
+        }
+
+        private void UpdateStatus(string statusMessage)
+        {
+            OnStatusUpdated.SafeInvoke(statusMessage);
         }
     }
 }

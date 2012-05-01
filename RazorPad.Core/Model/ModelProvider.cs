@@ -13,14 +13,6 @@ namespace RazorPad
         }
         private event EventHandler _modelChanged;
 
-        public Type ModelType { get; set; }
-
-
-        protected ModelProvider(Type modelType)
-        {
-            ModelType = modelType ?? typeof(object);
-        }
-
 
         public virtual dynamic GetModel()
         {
@@ -32,12 +24,15 @@ namespace RazorPad
             return model;
         }
 
-        public void TriggerModelChanged()
+        protected void TriggerModelChanged()
         {
             if (_modelChanged != null)
                 _modelChanged(this, EventArgs.Empty);
         }
 
         protected abstract dynamic RebuildModel();
+
+        public abstract string Serialize();
+        public abstract void Deserialize(string serialized);
     }
 }

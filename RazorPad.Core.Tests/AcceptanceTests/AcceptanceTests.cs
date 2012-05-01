@@ -9,16 +9,16 @@ namespace RazorPad.Core.Tests
     public class AcceptanceTests
     {
         private TemplateCompiler _templateCompiler;
-        private RazorDocumentLoader _loader;
+        private RazorDocumentManager _manager;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _loader = new RazorDocumentLoader();
+            _manager = new RazorDocumentManager(new XmlRazorDocumentSource());
             _templateCompiler = new TemplateCompiler();
         }
 
-
+		
         [TestMethod]
         public void ShouldSupportFunctions()
         {
@@ -30,7 +30,7 @@ namespace RazorPad.Core.Tests
             Assert.AreEqual(output, results.Trim());
         }
 
-
+		
         [TestMethod]
         public void ShouldSupportHelpers()
         {
@@ -42,7 +42,7 @@ namespace RazorPad.Core.Tests
             Assert.AreEqual(output, results.Trim());
         }
 
-
+		
         [TestMethod]
         public void ShouldSupportSimpleRendering()
         {
@@ -54,7 +54,7 @@ namespace RazorPad.Core.Tests
             Assert.AreEqual(output, results.Trim());
         }
 
-
+		
         [TestMethod]
         public void ShouldSupportBasicRazorDocument()
         {
@@ -71,7 +71,7 @@ namespace RazorPad.Core.Tests
         private RazorDocument LoadDocument(string name)
         {
             using (var reader = GetResourceStream(name))
-                return _loader.Load(reader);
+                return _manager.Load(reader);
         }
 
         private string LoadResource(string name)

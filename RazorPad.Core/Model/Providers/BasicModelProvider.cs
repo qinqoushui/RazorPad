@@ -1,4 +1,5 @@
-using System;
+using System.ComponentModel.Composition;
+using System.Web.Script.Serialization;
 
 namespace RazorPad.Providers
 {
@@ -12,7 +13,6 @@ namespace RazorPad.Providers
                 var changed = _model != value;
 
                 _model = value;
-                ModelType = (_model == null) ? typeof(object) : _model.GetType();
 
                 if(changed)
                     TriggerModelChanged();
@@ -20,15 +20,35 @@ namespace RazorPad.Providers
         }
         private dynamic _model;
 
-        public BasicModelProvider(Type modelType = null, object model = null)
-            : base(modelType)
+        public BasicModelProvider(object model = null)
         {
             Model = model;
+        }
+
+        public override string Serialize()
+        {
+            return new JavaScriptSerializer().Serialize(Model);
+        }
+
+        public override void Deserialize(string serialized)
+        {
+            var serializer = new JavaScriptSerializer();
+            Model = serializer.DeserializeObject(serialized);
         }
 
         protected override dynamic RebuildModel()
         {
             return Model;
+        }
+
+
+        [Export(typeof(IModelProviderFactory))]
+        public class BasicModelProviderFactory : IModelProviderFactory
+        {
+            public IModelProvider Create(dynamic model = null)
+            {
+                return new BasicModelProvider(model: model);
+            }
         }
     }
 }
