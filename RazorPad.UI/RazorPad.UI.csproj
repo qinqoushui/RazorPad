@@ -41,13 +41,12 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AvalonEdit\BraceFoldingStrategy.cs" />
+    <Compile Include="AvalonEdit\BraceFoldingStrategy.cs" />  
     <Compile Include="ModelBuilders\IModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\Json\JsonModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\Json\JsonModelBuilderViewModel.cs" />
