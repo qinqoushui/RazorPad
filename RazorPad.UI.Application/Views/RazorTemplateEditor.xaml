@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:RazorPadExt="clr-namespace:RazorPad.UI.Wpf;assembly=RazorPad.UI">
     
-    <RazorPadExt:DelayedNotifyPropertyChangedTextBox 
-        Name="textEditor" FontFamily="Consolas"
-        FontSize="10pt" />
-    
+    <RazorPadExt:CodeEditor Name="textEditor" 
+                            FontFamily="Consolas"
+                            FontSize="10pt"
+                            SyntaxHighlighting="HTML"  />
+
 </UserControl>
