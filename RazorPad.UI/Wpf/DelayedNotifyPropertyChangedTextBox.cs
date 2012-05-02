@@ -22,7 +22,7 @@ namespace RazorPad.UI.Wpf
             set { _textChangedTimer.Interval = value; }
         }
 
-        public DelayedNotifyPropertyChangedTextBox()
+		public DelayedNotifyPropertyChangedTextBox()
         {
             _textChangedTimer = new Timer { Interval = DefaultTextChangedEventDelay };
             InitializeTextChangedTimer();
