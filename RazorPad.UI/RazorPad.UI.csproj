@@ -64,8 +64,7 @@
     <Compile Include="ViewModel\NotifyPropertyChanged.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Wpf\RazorIndentationStrategy.cs" />
-    <Compile Include="Wpf\RazorTemplateEditor.cs" />
+    <Compile Include="Wpf\RelayCommand.cs" />
     <Compile Include="Wpf\TheRealObservableCollection.cs" />
   </ItemGroup>
   <ItemGroup>

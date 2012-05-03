@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using RazorPad.Framework;
 using RazorPad.Persistence;
 using RazorPad.Providers;
+using RazorPad.UI;
 using RazorPad.UI.ModelBuilders;
 using RazorPad.UI.Wpf;
 
 namespace RazorPad.ViewModels
 {
     [Export]
-    public class MainWindowViewModel : CommandSink
+    public class MainWindowViewModel : ViewModelBase
     {
         private readonly RazorDocumentManager _documentManager;
         private readonly ModelProviders _modelProviders;
@@ -20,13 +23,25 @@ namespace RazorPad.ViewModels
 
         public event EventHandler<EventArgs<string>> Error;
 
-        public Func<RazorTemplateEditorViewModel, string> GetSaveAsFilename
-        {
-            get { return _getSaveAsFilename; }
-            set { _getSaveAsFilename = value; }
-        }
-        private Func<RazorTemplateEditorViewModel, string> _getSaveAsFilename = 
-            template => template.Filename;
+        public ICommand CloseCommand { get; private set; }
+        public ICommand NewCommand { get; private set; }
+        public ICommand OpenCommand { get; private set; }
+        public ICommand SaveCommand { get; private set; }
+        public ICommand SaveAsCommand { get; private set; }
+
+        // Use thunks to create test seams
+        internal Func<RazorTemplateEditorViewModel, MessageBoxResult> ConfirmSaveDirtyDocumentThunk =
+            MessageBoxHelpers.ShowConfirmSaveDirtyDocumentMessageBox;
+
+        internal Func<string> GetOpenFilenameThunk =
+            MessageBoxHelpers.ShowOpenFileDialog;
+
+        internal Func<RazorTemplateEditorViewModel, string> GetSaveAsFilenameThunk =
+            MessageBoxHelpers.ShowSaveAsDialog;
+
+        internal Action<string> ShowErrorThunk =
+            MessageBoxHelpers.ShowErrorMessageBox;
+
 
         public RazorTemplateEditorViewModel CurrentTemplate
         {
@@ -38,9 +53,15 @@ namespace RazorPad.ViewModels
 
                 _currentTemplate = value;
                 OnPropertyChanged("CurrentTemplate");
+                OnPropertyChanged("HasCurrentTemplate");
             }
         }
         private RazorTemplateEditorViewModel _currentTemplate;
+
+        public bool HasCurrentTemplate
+        {
+            get { return CurrentTemplate != null; }
+        }
 
         public ObservableCollection<RazorTemplateEditorViewModel> TemplateEditors
         {
@@ -68,41 +89,48 @@ namespace RazorPad.ViewModels
             _documentManager = documentManager;
             _modelBuilders = modelBuilders;
             _modelProviders = modelProviders;
-            
-            InitializeTemplateEditors();
+
+            TemplateEditors = new ObservableCollection<RazorTemplateEditorViewModel>();
+
             RegisterCommands();
+
+            CreateDemoTemplate();
         }
 
         private void RegisterCommands()
         {
-            RegisterCommand(ApplicationCommands.Save,
-                x => CurrentTemplate != null && CurrentTemplate.CanSaveToCurrentlyLoadedFile,
-                x => SaveCurrentTemplate());
+            CloseCommand = new RelayCommand(
+                    p => Close(CurrentTemplate), 
+                    p => HasCurrentTemplate
+                );
 
-            RegisterCommand(ApplicationCommands.SaveAs,
-                x => CurrentTemplate != null && CurrentTemplate.CanSaveAsNewFilename,
-                x => GetSaveAsFilename.Invoke(CurrentTemplate));
+            NewCommand = new RelayCommand(() => AddNewTemplateEditor());
 
-            RegisterCommand(ApplicationCommands.New,
-                            x => CanAddNewTemplate,
-                            x => AddNewTemplateEditor());
+            OpenCommand = new RelayCommand(p => {
+                    var filename = GetOpenFilenameThunk();
+                    AddNewTemplateEditor(filename);
+                });
+
+            SaveCommand = new RelayCommand(
+                    p => Save(CurrentTemplate), 
+                    p => HasCurrentTemplate
+                );
+
+            SaveAsCommand = new RelayCommand(
+                    p => SaveAs(CurrentTemplate.Document), 
+                    p => HasCurrentTemplate && CurrentTemplate.CanSaveAsNewFilename
+                );
         }
 
-        protected bool CanAddNewTemplate
+        private void CreateDemoTemplate()
         {
-            get { return true; }
-        }
+            var demoDocument = new RazorDocument
+            {
+                Template = "<h1>Welcome to @Model.Name!</h1>\r\n<div>Start typing some text to get started.</div>\r\n<div>Or, try adding a property called 'Message' and see what happens...</div>\r\n\r\n<h3>@Model.Message</h3>",
+                ModelProvider = new JsonModelProvider(json: "{\r\n\tName: 'RazorPad'\r\n}")
+            };
 
-        private void InitializeTemplateEditors()
-        {
-            TemplateEditors = new ObservableCollection<RazorTemplateEditorViewModel>();
-
-            var defaultDocument = new RazorDocument {
-                    Template = "<h1>Welcome to @Model.Name!</h1>\r\n<div>Start typing some text to get started.</div>\r\n<div>Or, try adding a property called 'Message' and see what happens...</div>\r\n\r\n<h3>@Model.Message</h3>",
-                    ModelProvider = new JsonModelProvider(json: "{\r\n\tName: 'RazorPad'\r\n}")
-                };
-
-            AddNewTemplateEditor(new RazorTemplateEditorViewModel(defaultDocument, _modelBuilders, _modelProviders));
+            AddNewTemplateEditor(new RazorTemplateEditorViewModel(demoDocument, _modelBuilders, _modelProviders));
         }
 
         internal void AddNewTemplateEditor(string filename = null, bool current = true)
@@ -120,7 +148,12 @@ namespace RazorPad.ViewModels
                 return;
             }
 
-            var document = _documentManager.Load(filename);
+            RazorDocument document;
+
+            if (string.IsNullOrWhiteSpace(filename))
+                document = new RazorDocument();
+            else
+                document = _documentManager.Load(filename);
 
             AddNewTemplateEditor(new RazorTemplateEditorViewModel(document, _modelBuilders, _modelProviders));
         }
@@ -137,24 +170,60 @@ namespace RazorPad.ViewModels
             templateEditor.Execute();
         }
 
-        public void SaveCurrentTemplate(string fileName = null)
+
+        public void Close(RazorTemplateEditorViewModel document, bool? save = null)
+        {
+            if (document.IsDirty && save.GetValueOrDefault(true))
+            {
+                var shouldSave = ConfirmSaveDirtyDocumentThunk(document);
+
+                switch (shouldSave)
+                {
+                    case MessageBoxResult.Cancel:
+                        return;
+
+                    case MessageBoxResult.Yes:
+                        Save(document);
+                        break;
+                }
+            }
+
+            TemplateEditors.Remove(document);
+        }
+
+        public void Save(RazorTemplateEditorViewModel document)
+        {
+            var filename = document.Filename;
+
+            if (document.CanSaveToCurrentlyLoadedFile)
+                filename = null;
+
+            SaveAs(document.Document, filename);
+        }
+
+        public void SaveAs(RazorDocument document, string filename = null)
         {
             try
             {
-                var document = CurrentTemplate.Document;
+                if (filename == null)
+                    filename = GetSaveAsFilenameThunk(CurrentTemplate);
 
-                _documentManager.Save(document, fileName);
-
-                if(fileName != null)
+                if (string.IsNullOrWhiteSpace(filename))
                 {
-                    if(!fileName.Equals(document.Filename, StringComparison.OrdinalIgnoreCase))
-                        CurrentTemplate.Filename = fileName;
+                    Trace.TraceWarning("Filename is empty - skipping save");
+                    return;
                 }
+
+                _documentManager.Save(document, filename);
+
+                if (!filename.Equals(document.Filename, StringComparison.OrdinalIgnoreCase))
+                    document.Filename = filename;
             }
             catch (Exception ex)
             {
                 Error.SafeInvoke(ex.Message);
             }
         }
+
     }
 }
