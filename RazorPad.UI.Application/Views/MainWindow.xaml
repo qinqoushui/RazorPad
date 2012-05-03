@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:Views="clr-namespace:RazorPad.Views"
         xmlns:Output="clr-namespace:RazorPad.Views.Output"
-        xmlns:RpWpf="clr-namespace:RazorPad.UI.Wpf;assembly=RazorPad.UI" Title="Razor Pad" Height="700" Width="1000">
+        xmlns:RpWpf="clr-namespace:RazorPad.UI.Wpf;assembly=RazorPad.UI"
+        Title="Razor Pad" Height="700" Width="1000">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -24,13 +25,6 @@
                 <MenuItem Header="_Manage References..." Click="ManageReference_Click" IsEnabled="True" />
             </MenuItem>
         </Menu>
-
-        <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="{Binding StatusMessage}" />
-            </StatusBarItem>
-            <StatusBarItem />
-        </StatusBar>
 
         <DockPanel Grid.Row="1" LastChildFill="True">
 
@@ -72,22 +66,14 @@
                     </TabItem>
 
                     <TabItem x:Name="OutputTab" Header="Source View">
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                            <TextBox Text="{Binding ExecutedTemplateOutput}" 
-                                     IsReadOnly="True" HorizontalScrollBarVisibility="Auto"
                         <Output:SourceView />
-                        </ScrollViewer>
                     </TabItem>
 
                     <TabItem x:Name="CodeTab" Header="Generated Code">
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                            <TextBox Text="{Binding GeneratedTemplateCode}" IsReadOnly="True" />
                         <Output:GeneratedCodeView />
                     </TabItem>
 
                     <TabItem x:Name="MessagesTab" Header="Messages" >
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                            <TextBox Text="{Binding MessageBuffer}" DataContext="{Binding Messages}" IsReadOnly="True" />
                         <Output:MessagesView />
                     </TabItem>
                     
