@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Threading;
+using System.Xml;
 using ICSharpCode.AvalonEdit.Folding;
-using ICSharpCode.AvalonEdit.Indentation.CSharp;
-using RazorPad.UI.AvalonEdit;
+using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 
 namespace RazorPad.UI.Wpf
 {
@@ -15,6 +16,7 @@ namespace RazorPad.UI.Wpf
 		{
 			TextArea.IndentationStrategy = new RazorIndentationStrategy(Options);
 			InitializeFolding(new XmlFoldingStrategy());
+            SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("HTML");
 		}
 
 	}

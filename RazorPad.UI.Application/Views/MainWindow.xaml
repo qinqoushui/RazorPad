@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:Views="clr-namespace:RazorPad.Views"
         xmlns:Output="clr-namespace:RazorPad.Views.Output"
-        xmlns:RpWpf="clr-namespace:RazorPad.UI.Wpf;assembly=RazorPad.UI"
+        xmlns:RazorPadExt="clr-namespace:RazorPad.UI.Wpf;assembly=RazorPad.UI"
         Title="Razor Pad" Height="700" Width="1000">
 
     <Grid>
@@ -45,7 +45,7 @@
                     <TabControl Grid.Row="0" ItemsSource="{Binding TemplateEditors}" SelectedValue="{Binding CurrentTemplate}">
                         <TabControl.ContentTemplate>
                             <DataTemplate>
-                                <RpWpf:RazorTemplateEditor Code="{Binding Template}" AllowDrop="True" />
+                                <RazorPadExt:RazorTemplateEditor Code="{Binding Template}" AllowDrop="True" />
                             </DataTemplate>
                         </TabControl.ContentTemplate>
                         <TabControl.ItemTemplate>

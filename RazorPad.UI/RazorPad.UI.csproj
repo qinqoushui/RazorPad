@@ -57,16 +57,20 @@
     <Compile Include="Wpf\BrowseBehavior.cs" />
     <Compile Include="Wpf\CodeEditor.cs" />
     <Compile Include="Wpf\CommandSinkBinding.cs" />
+    <Compile Include="Wpf\CSharpCodeEditor.cs" />
     <Compile Include="Wpf\DelayedNotifyPropertyChangedTextBox.cs" />
     <Compile Include="Wpf\ICommandSink.cs" />
     <Compile Include="Util\InMemoryTextWriter.cs" />
     <Compile Include="ViewModel\NotifyPropertyChanged.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Wpf\JsonCodeEditor.cs" />
+    <Compile Include="Wpf\JsonIndentationStrategy.cs" />
     <Compile Include="Wpf\RazorIndentationStrategy.cs" />
     <Compile Include="Wpf\RazorTemplateEditor.cs" />
     <Compile Include="Wpf\RelayCommand.cs" />
     <Compile Include="Wpf\TheRealObservableCollection.cs" />
+    <Compile Include="Wpf\XmlCodeEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="ModelBuilders\Json\JsonModelBuilder.xaml">

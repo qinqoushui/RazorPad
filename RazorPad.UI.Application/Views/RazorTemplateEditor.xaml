@@ -5,7 +5,6 @@
     
     <RazorPadExt:CodeEditor Name="textEditor" 
                             FontFamily="Consolas"
-                            FontSize="10pt"
-                            SyntaxHighlighting="HTML"  />
+                            FontSize="10pt" />
 
 </UserControl>

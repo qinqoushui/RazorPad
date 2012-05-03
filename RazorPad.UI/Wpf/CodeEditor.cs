@@ -39,22 +39,14 @@ namespace RazorPad.UI.Wpf
 		}
 
 		FoldingManager _foldingManager;
-		AbstractFoldingStrategy _foldingStrategy;
 
 		protected void InitializeFolding(AbstractFoldingStrategy foldingStrategy)
 		{
-			_foldingStrategy = foldingStrategy;
 			_foldingManager = FoldingManager.Install(TextArea);
-			_foldingStrategy.UpdateFoldings(_foldingManager, Document);
+            foldingStrategy.UpdateFoldings(_foldingManager, Document);
 
 			var foldingUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-			foldingUpdateTimer.Tick += (o, args) =>
-			{
-				if (_foldingStrategy != null)
-				{
-					_foldingStrategy.UpdateFoldings(_foldingManager, Document);
-				}
-			};
+			foldingUpdateTimer.Tick += (o, args) => foldingStrategy.UpdateFoldings(_foldingManager, Document);
 
 			foldingUpdateTimer.Start();
 		}

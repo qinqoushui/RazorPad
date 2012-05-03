@@ -7,9 +7,8 @@
              xmlns:UI="clr-namespace:RazorPad.UI;assembly=RazorPad.UI"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
-    <RazorPadExt:DelayedNotifyPropertyChangedTextBox x:Name="ModelEditor" Grid.Row="1"
-             Text="{Binding Path=CSharp, UpdateSourceTrigger=Explicit}"
-             AcceptsReturn="True" AcceptsTab="true" 
-             AllowDrop="True" AutoWordSelection="True" />
+    <RazorPadExt:CSharpCodeEditor x:Name="ModelEditor" Grid.Row="1"
+             Code="{Binding Path=CSharp, UpdateSourceTrigger=Explicit}"
+             AllowDrop="True"  />
 
 </UI:ModelBuilder>

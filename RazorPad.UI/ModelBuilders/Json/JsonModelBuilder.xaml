@@ -15,7 +15,7 @@
         
         <Label Grid.Row="0">JSON Model</Label>
 
-        <RazorPadExt:DelayedNotifyPropertyChangedTextBox x:Name="ModelEditor" Grid.Row="1"
+        <RazorPadExt:JsonCodeEditor Code="{Binding Template}" x:Name="ModelEditor" Grid.Row="1"
              AllowDrop="True"  />
 
     </Grid>
