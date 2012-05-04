@@ -12,6 +12,7 @@ using RazorPad.Compilation;
 using RazorPad.Framework;
 using RazorPad.UI;
 using RazorPad.UI.ModelBuilders;
+using AvalonEditDocument = ICSharpCode.AvalonEdit.Document;
 
 namespace RazorPad.ViewModels
 {
@@ -147,21 +148,23 @@ namespace RazorPad.ViewModels
         }
         private GeneratorResults _generatorResults;
 
-        public string Template
-        {
-            get { return _document.Template; }
-            set
-            {
-                if (_document.Template == value)
-                    return;
+		public string Template
+		{
+			get { return _document.Template; }
+			set
+			{
+				if (_document.Template == value)
+					return;
 
-                _document.Template = value;
-                OnPropertyChanged("Template");
-                Refresh();
-            }
-        }
+				_document.Template = value;
+				OnPropertyChanged("Template");
+				Refresh();
+			}
+		}
 
-        public bool CanSaveToCurrentlyLoadedFile
+		
+
+    	public bool CanSaveToCurrentlyLoadedFile
         {
             get { return !string.IsNullOrWhiteSpace(Filename); }
         }

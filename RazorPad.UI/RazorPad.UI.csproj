@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AvalonEdit\BraceFoldingStrategy.cs" />
+    <Compile Include="AvalonEdit\TextToTextDocumentConverter.cs" />
     <Compile Include="ModelBuilders\IModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\Json\JsonModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\Json\JsonModelBuilderViewModel.cs" />
