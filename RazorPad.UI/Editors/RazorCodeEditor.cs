@@ -10,7 +10,7 @@ namespace RazorPad.UI.Editors
 		{
             Editor.TextArea.IndentationStrategy = new DefaultIndentationStrategy();
 			InitializeFolding(new XmlFoldingStrategy());
-		    Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("HTML");
+		    Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("CSharpRazor");
 		}
 
 	}
