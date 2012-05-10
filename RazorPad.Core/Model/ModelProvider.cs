@@ -1,33 +1,57 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using RazorPad.Framework;
 
 namespace RazorPad
 {
     public abstract class ModelProvider : IModelProvider
     {
+        public event EventHandler<RazorPadErrorEventArgs> Error
+        {
+            add { _errorHandlers += value; }
+            remove { _errorHandlers -= value; }
+        }
+        private event EventHandler<RazorPadErrorEventArgs> _errorHandlers;
+
         public event EventHandler ModelChanged
         {
-            add { _modelChanged += value; }
-            remove { _modelChanged -= value; }
+            add { _modelChangedHandlers += value; }
+            remove { _modelChangedHandlers -= value; }
         }
-        private event EventHandler _modelChanged;
+        private event EventHandler _modelChangedHandlers;
 
 
         public virtual dynamic GetModel()
         {
-            var model = RebuildModel();
+            dynamic model = null;
 
-            if (model is IDictionary<string, object>)
-                model = new DynamicDictionary((IDictionary<string, object>)model);
+            try
+            {
+                model = RebuildModel();
 
-            return model;
+                if (model is IDictionary<string, object>)
+                    model = new DynamicDictionary((IDictionary<string, object>)model);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Error rebuilding model: {0}", ex);
+                TriggerError(new RazorPadError(ex));
+            }
+
+            return model ?? new DynamicDictionary();
+        }
+
+        protected void TriggerError(RazorPadError error)
+        {
+            if (_errorHandlers != null)
+                _errorHandlers(this, new RazorPadErrorEventArgs(error));
         }
 
         protected void TriggerModelChanged()
         {
-            if (_modelChanged != null)
-                _modelChanged(this, EventArgs.Empty);
+            if (_modelChangedHandlers != null)
+                _modelChangedHandlers(this, EventArgs.Empty);
         }
 
         protected abstract dynamic RebuildModel();

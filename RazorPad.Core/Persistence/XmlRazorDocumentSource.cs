@@ -48,26 +48,32 @@ namespace RazorPad.Persistence
 
             var root = source.Root;
             var metadataEl = root.Element("Metadata") ?? new XElement("Metadata");
+            var referencesEl = root.Element("References") ?? new XElement("References");
             var modelEl = root.Element("Model") ?? new XElement("Model");
             var templateEl = root.Element("Template") ?? new XElement("Template");
 
             var modelProviderEl = modelEl.Attribute("Provider");
             var modelProviderName = (modelProviderEl == null) ? "Json" : modelProviderEl.Value;
-            var modelProvider = _modelProviderFactory.Create(modelProviderName, modelEl.Value);
+            var modelProvider = _modelProviderFactory.Create(modelProviderName);
+            modelProvider.Deserialize(modelEl.Value);
+            var references = referencesEl.Elements().Select(x => x.Value).Where(x => !string.IsNullOrWhiteSpace(x));
 
             IDictionary<string, string> metadata =
                 metadataEl.Elements()
                     .Select(x => new KeyValuePair<string, string>(x.Name.LocalName, x.Value))
                     .ToDictionary(val => val.Key, val => val.Value);
 
-            return new RazorDocument(templateEl.Value, modelProvider, metadata);
+            return new RazorDocument(templateEl.Value, references, modelProvider, metadata);
         }
 
         public void Save(RazorDocument document, string filename = null)
         {
             var destination = filename ?? document.Filename;
-            using (var stream = File.OpenWrite(destination))
+            using (var stream = File.Open(destination, FileMode.Truncate, FileAccess.Write))
+            {
                 Save(document, stream);
+                stream.Flush(true);
+            }
         }
 
         public void Save(RazorDocument document, Stream stream)
@@ -85,14 +91,24 @@ namespace RazorPad.Persistence
             }
             writer.WriteEndElement();
 
+            writer.WriteStartElement("References");
+            foreach (var reference in document.References ?? Enumerable.Empty<string>())
+            {
+                writer.WriteElementString("Reference", reference);
+            }
+            writer.WriteEndElement();
+
+            var providerName = (string)new ModelProviderName(document.ModelProvider);
             var serializedModel = document.ModelProvider.Serialize();
             writer.WriteStartElement("Model");
-            writer.WriteAttributeString("Provider", new ModelProviderName(document.ModelProvider));
+            if (!string.IsNullOrWhiteSpace(providerName))
+                writer.WriteAttributeString("Provider", providerName);
             writer.WriteCData(serializedModel);
             writer.WriteEndElement();
 
             writer.WriteStartElement("Template");
-            writer.WriteAttributeString("BaseClass", document.TemplateBaseClassName);
+            if (!string.IsNullOrWhiteSpace(document.TemplateBaseClassName))
+                writer.WriteAttributeString("BaseClass", document.TemplateBaseClassName);
             writer.WriteCData(document.Template);
             writer.WriteEndElement();
 

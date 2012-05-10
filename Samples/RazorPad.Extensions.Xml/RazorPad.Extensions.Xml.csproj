@@ -74,6 +74,10 @@
       <Name>RazorPad.UI</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\RazorPad.Contracts\RazorPad.Contracts.csproj">
+      <Project>{92E04BBB-A022-41BA-A13C-1EB6C47DFFAE}</Project>
+      <Name>RazorPad.Contracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

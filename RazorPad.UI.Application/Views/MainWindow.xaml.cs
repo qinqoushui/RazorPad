@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.IO;
 using System.Windows;
 using RazorPad.Compilation.Hosts;
-using System.Linq;
-using System.Windows;
-using RazorPad.Compilation.Hosts;
+using RazorPad.Providers;
+using RazorPad.UI;
+using RazorPad.UI.Theming;
 using RazorPad.ViewModels;
 
 namespace RazorPad.Views
@@ -18,7 +17,7 @@ namespace RazorPad.Views
 
         protected MainWindowViewModel ViewModel
         {
-            get { return (MainWindowViewModel) DataContext; }
+            get { return (MainWindowViewModel)DataContext; }
             private set { DataContext = value; }
         }
 
@@ -32,51 +31,65 @@ namespace RazorPad.Views
 
         public MainWindow()
         {
+            // TODO: Replace with real logging
+            var traceWriter = new ObservableTextWriter();
+            Trace.Listeners.Add(new TextWriterTraceListener(traceWriter) { TraceOutputOptions = TraceOptions.None });
+
+            Trace.TraceInformation("Initializing application...");
+
             ServiceLocator.Initialize();
 
+            var themeLoader = ServiceLocator.Get<ThemeLoader>();
+            var themes = themeLoader.LoadThemes();
+
             ViewModel = ServiceLocator.Get<MainWindowViewModel>();
+            ViewModel.GetReferencesThunk = GetReferences;
+            ViewModel.Messages = traceWriter;
+            ViewModel.Themes = new ObservableCollection<Theme>(themes);
+
+            CreateDemoTemplate();
 
             InitializeComponent();
+
+            Trace.TraceInformation("Done initializing");
+        }
+
+        private void CreateDemoTemplate()
+        {
+            var demoDocument = new RazorDocument
+            {
+                Template = "<h1>Welcome to @Model.Name!</h1>\r\n<div>Start typing some text to get started.</div>\r\n<div>Or, try adding a property called 'Message' and see what happens...</div>\r\n\r\n<h3>@Model.Message</h3>",
+                ModelProvider = new JsonModelProvider { Json = "{\r\n\tName: 'RazorPad'\r\n}" }
+            };
+
+            ViewModel.AddNewTemplateEditor(demoDocument);
         }
 
 
-        private void ManageReference_Click(object sender, RoutedEventArgs e)
+        private IEnumerable<string> GetReferences(IEnumerable<string> loadedReferences)
         {
-            var loadedReferencesTempArray =
-                new string[
-                    ViewModel.CurrentTemplate.TemplateCompiler.CompilationParameters.CompilerParameters.
-                        ReferencedAssemblies.Count];
+            var references = loadedReferences.ToArray();
 
-            // get the loaded assembly names from the stupid collection to an enumerable one
-            ViewModel.CurrentTemplate.TemplateCompiler.CompilationParameters.CompilerParameters.ReferencedAssemblies.
-                CopyTo(
-                    loadedReferencesTempArray, 0);
+            var assemblyReferences = references.Select(s =>
+                new AssemblyReference(s)
+                {
+                    IsNotReadOnly = !CoreReferences.Contains(s),
+                    IsInstalled = true,
+                });
 
-            var loadedReferences = loadedReferencesTempArray
-                .Select(s =>
-                        new Reference(s)
-                            {
-                                IsNotReadOnly = !CoreReferences.Contains(s),
-                                IsInstalled = true,
-                            });
-
-            var dialogDataContext = new ReferencesViewModel(loadedReferences);
+            var dialogDataContext = new ReferencesViewModel(assemblyReferences);
             var dlg = new ReferencesDialogWindow
-                          {
-                              Owner = this,
-                              DataContext = dialogDataContext
-                          };
+            {
+                Owner = this,
+                DataContext = dialogDataContext
+            };
 
             dlg.ShowDialog();
 
-            if (dlg.DialogResult != true) return;
+            if (dlg.DialogResult == true)
+                references = dialogDataContext.InstalledReferences.References.Select(reference => reference.Location).ToArray();
 
-            // clear existing ones
-            ViewModel.CurrentTemplate.TemplateCompiler.CompilationParameters.CompilerParameters.ReferencedAssemblies.
-                Clear();
-
-            foreach (var reference in dialogDataContext.InstalledReferences.References)
-                ViewModel.CurrentTemplate.TemplateCompiler.CompilationParameters.AddAssemblyReference(reference.Location);
+            return references;
         }
     }
 }

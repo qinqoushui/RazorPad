@@ -15,12 +15,12 @@ namespace RazorPad
         }
         private static volatile ModelProviders _current = new ModelProviders();
 
-        public static IModelProviderFactory Default
+        public static IModelProviderFactory DefaultFactory
         {
-            get { return _default = _default ?? new JsonModelProvider.JsonModelProviderFactory(); }
-            set { _default = value; }
+            get { return _defaultFactory = _defaultFactory ?? new JsonModelProvider.JsonModelProviderFactory(); }
+            set { _defaultFactory = value; }
         }
-        private static volatile IModelProviderFactory _default;
+        private static volatile IModelProviderFactory _defaultFactory;
 
         public IEnumerable<KeyValuePair<string, IModelProviderFactory>> Providers
         {
@@ -50,7 +50,7 @@ namespace RazorPad
                 _providers.Add(providerNickname, factory);
         }
 
-        public IModelProvider Create(string provider, dynamic model = null)
+        public IModelProvider Create(string provider)
         {
             IModelProviderFactory factory;
 
@@ -60,10 +60,10 @@ namespace RazorPad
             {
                 Trace.TraceWarning("Could not find {0} -- falling back to default model provider factory",
                                    providerNickname);
-                factory = Default;
+                factory = DefaultFactory;
             }
 
-            return factory.Create(model);
+            return factory.Create();
         }
 
         private static string GetProviderDictionaryKey(string typeName)

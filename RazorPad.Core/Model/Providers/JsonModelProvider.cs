@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.Composition;
 using System.Web.Script.Serialization;
-using ICSharpCode.AvalonEdit.Document;
 
 namespace RazorPad.Providers
 {
@@ -20,23 +19,6 @@ namespace RazorPad.Providers
         }
         private string _json;
 
-        public JsonModelProvider(string json = null)
-        {
-            Json = json;
-
-            if (!string.IsNullOrWhiteSpace(json))
-                JsonDocument = new TextDocument(json);
-            else
-            {
-                JsonDocument = new TextDocument();
-            }
-        }
-
-        protected TextDocument JsonDocument
-        {
-            get;
-            set;
-        }
 
         public override string Serialize()
         {
@@ -58,12 +40,8 @@ namespace RazorPad.Providers
 
 
         [Export(typeof(IModelProviderFactory))]
-        public class JsonModelProviderFactory : IModelProviderFactory
+        public class JsonModelProviderFactory : ModelProviderFactory<JsonModelProvider>
         {
-            public IModelProvider Create(dynamic model = null)
-            {
-                return new JsonModelProvider(json: model);
-            }
         }
     }
 }
