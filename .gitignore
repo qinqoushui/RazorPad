@@ -10,3 +10,4 @@ UpgradeLog.XML
 packages
 *.DotSettings
 *.crunchsolution.cache
+/razorpad.ui/Help
