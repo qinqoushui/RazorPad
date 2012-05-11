@@ -4,9 +4,9 @@
         xmlns:avalonDock="clr-namespace:AvalonDock;assembly=AvalonDock"
         xmlns:avalonDockLayout="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
         xmlns:avalonDockThemes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2010" 
-        xmlns:AttachedProperties="clr-namespace:RazorPad.UI;assembly=RazorPad.UI" 
-        xmlns:Editors="clr-namespace:RazorPad.UI.Editors;assembly=RazorPad.UI"
         xmlns:Views="clr-namespace:RazorPad.Views" 
+        xmlns:Editors="clr-namespace:RazorPad.UI.Editors;assembly=RazorPad.UI"
+        xmlns:AttachedProperties="clr-namespace:RazorPad.UI;assembly=RazorPad.UI" 
         Title="Razor Pad" Height="700" Width="1000">
     <Window.Resources>
         <avalonDockThemes:VS2010Theme x:Key="VS2010Theme"/>
@@ -21,7 +21,7 @@
         <KeyBinding Modifiers="Control" Key="F4" Command="{Binding CloseCommand}" />
         <KeyBinding Gesture="Ctrl+Plus"  Command="{Binding FontSizeCommand}" CommandParameter="Increase" />
         <KeyBinding Gesture="Ctrl+Minus" Command="{Binding FontSizeCommand}" CommandParameter="Decrease" />
-        <KeyBinding Gesture="Ctrl+0"     Command="{Binding FontSizeCommand}" CommandParameter="Reset" />
+        <KeyBinding Gesture="Ctrl+0"     Command="{Binding FontSizeCommand}" CommandParameter="10" />
     </Window.InputBindings>
 
     <Grid>
@@ -67,7 +67,7 @@
                 <DataTemplate>
                     <Editors:CodeEditor Text="{Binding Template}" 
                                         EditorLanguage="Razor" 
-                                        EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                        EditorFontSize="{Binding Parent.FontSize}" 
                     />
                 </DataTemplate>
             </avalonDock:DockingManager.DocumentTemplate>
@@ -118,7 +118,7 @@
                                                             Text="{Binding ExecutedTemplateOutput}" 
                                                             ReadOnly="True" 
                                                             EditorLanguage="XML" 
-                                                            EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                                            EditorFontSize="{Binding Parent.FontSize}" 
                                         />
                                     </avalonDockLayout:LayoutAnchorable>
 
@@ -127,7 +127,7 @@
                                                             Text="{Binding GeneratedTemplateCode}" 
                                                             ReadOnly="True" 
                                                             EditorLanguage="C#" 
-                                                            EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                                            EditorFontSize="{Binding Parent.FontSize}" 
                                         />
                                     </avalonDockLayout:LayoutAnchorable>
 
@@ -136,7 +136,7 @@
                                             <TextBox DataContext="{Binding CurrentTemplate}"
                                                      Text="{Binding RazorSyntaxTree}" 
                                                      IsReadOnly="True" 
-                                                     FontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                                     FontSize="{Binding Parent.FontSize}" 
                                             />
                                         </ScrollViewer>
                                     </avalonDockLayout:LayoutAnchorable>
@@ -160,7 +160,7 @@
                                             <TextBox Text="{Binding MessageBuffer}" 
                                                      DataContext="{Binding Messages}" 
                                                      IsReadOnly="True" 
-                                                     FontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                                     FontSize="{Binding Parent.FontSize}" 
                                             />
                                         </ScrollViewer>
                                     </avalonDockLayout:LayoutAnchorable>
