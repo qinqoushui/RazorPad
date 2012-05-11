@@ -1,6 +1,11 @@
+using System.IO;
+using System.Reflection;
+using System.Xml;
 using ICSharpCode.AvalonEdit.Folding;
 using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Indentation;
+using System.Linq;
 
 namespace RazorPad.UI.Editors
 {
@@ -10,7 +15,14 @@ namespace RazorPad.UI.Editors
         {
             editor.Editor.TextArea.IndentationStrategy = new DefaultIndentationStrategy();
             editor.InitializeFolding(new XmlFoldingStrategy());
-            editor.Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("HTML");
+            editor.Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("CSharpRazor") ?? LoadCSharpRazorDefinition();
+        }
+
+        private IHighlightingDefinition LoadCSharpRazorDefinition()
+        {
+            using (var s = GetType().Assembly.GetManifestResourceStream("RazorPad.UI.Resources.CSharpRazor.xshd"))
+            using (var reader = new XmlTextReader(s))
+                return HighlightingLoader.Load(reader, HighlightingManager.Instance);
         }
     }
 }
