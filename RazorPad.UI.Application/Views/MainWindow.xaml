@@ -21,7 +21,7 @@
         <KeyBinding Modifiers="Control" Key="F4" Command="{Binding CloseCommand}" />
         <KeyBinding Gesture="Ctrl+Plus"  Command="{Binding FontSizeCommand}" CommandParameter="Increase" />
         <KeyBinding Gesture="Ctrl+Minus" Command="{Binding FontSizeCommand}" CommandParameter="Decrease" />
-        <KeyBinding Gesture="Ctrl+0"     Command="{Binding FontSizeCommand}" CommandParameter="12" />
+        <KeyBinding Gesture="Ctrl+0"     Command="{Binding FontSizeCommand}" CommandParameter="Reset" />
     </Window.InputBindings>
 
     <Grid>

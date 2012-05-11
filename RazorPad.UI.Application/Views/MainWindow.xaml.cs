@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using NLog;
 using NLog.Config;
 using RazorPad.Providers;
@@ -45,11 +46,26 @@ namespace RazorPad.Views
             ViewModel.Messages = observableWriter;
             ViewModel.Themes = new ObservableCollection<Theme>(themes);
 
+            MouseWheel += HandleMouseWheel;
+
             CreateDemoTemplate();
 
             InitializeComponent();
 
             Log.Info("Done initializing");
+        }
+
+        void HandleMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var ctrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+
+            if (!ctrl)
+                return;
+
+            if(e.Delta > 0)
+                ViewModel.FontSizeCommand.Execute("Increase");
+            if(e.Delta < 0)
+                ViewModel.FontSizeCommand.Execute("Decrease");
         }
 
         private void CreateDemoTemplate()

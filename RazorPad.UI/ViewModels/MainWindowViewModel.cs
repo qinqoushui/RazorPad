@@ -19,6 +19,8 @@ namespace RazorPad.ViewModels
     [Export]
     public class MainWindowViewModel : ViewModelBase
     {
+        protected const double DefaultFontSize = 12;
+
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         private readonly RazorDocumentManager _documentManager;
@@ -105,7 +107,7 @@ namespace RazorPad.ViewModels
                 OnPropertyChanged("FontSize");
             }
         }
-        private double _fontSize = 12;
+        private double _fontSize;
 
         public string StatusMessage
         {
@@ -145,6 +147,7 @@ namespace RazorPad.ViewModels
             _modelBuilders = modelBuilders;
             _modelProviders = modelProviders;
 
+            FontSize = DefaultFontSize;
             TemplateEditors = new ObservableCollection<RazorTemplateEditorViewModel>();
 
             RegisterCommands();
@@ -205,6 +208,8 @@ namespace RazorPad.ViewModels
                 FontSize += 2;
             if (strVal == "Decrease")
                 FontSize -= 2;
+            if (strVal == "Reset")
+                FontSize = DefaultFontSize;
 
             double size;
             if (double.TryParse(strVal, out size))
