@@ -6,8 +6,9 @@
                  xmlns:UI="clr-namespace:RazorPad.UI;assembly=RazorPad.UI"
                  xmlns:Editors="clr-namespace:RazorPad.UI.Editors;assembly=RazorPad.UI" mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
-    <Editors:XmlCodeEditor x:Name="ModelEditor" Grid.Row="1"
+    <Editors:CodeEditor x:Name="ModelEditor" Grid.Row="1"
              Text="{Binding Path=Xml, UpdateSourceTrigger=Explicit}"
-             AllowDrop="True" />
+             AllowDrop="True"
+             EditorLanguage="XML" />
 
 </UI:ModelBuilder>

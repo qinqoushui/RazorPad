@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,6 +11,12 @@ namespace RazorPad.UI.Editors
 {
     public class CodeEditor : UserControl
     {
+        public static readonly DependencyProperty EditorLanguageProperty = DependencyProperty.Register("EditorLanguage",
+            typeof(string), typeof(CodeEditor), new FrameworkPropertyMetadata(string.Empty, OnEditorLanguageChanged)
+            {
+                BindsTwoWayByDefault = true,
+            });
+
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text",
             typeof(string), typeof(CodeEditor), new FrameworkPropertyMetadata(string.Empty, OnTextChanged)
             {
@@ -24,8 +31,24 @@ namespace RazorPad.UI.Editors
 
 
         private DispatcherTimer _textChangedTimer;
+        private static readonly IDictionary<string, ICodeEditorStrategy> _strategies =
+            new Dictionary<string, ICodeEditorStrategy>
+                {
+                    {"C#", new CSharpStrategy()},
+                    {"JavaScript", new JavaScriptStrategy()},
+                    {"Razor", new RazorStrategy()},
+                    {"XML", new XmlStrategy()},
+                };
+
+        private FoldingManager _foldingManager;
 
         public TextEditor Editor { get; private set; }
+
+        public string EditorLanguage
+        {
+            get { return (string)GetValue(ReadOnlyProperty); }
+            set { SetValue(ReadOnlyProperty, value); }
+        }
 
         public bool ReadOnly
         {
@@ -55,9 +78,14 @@ namespace RazorPad.UI.Editors
             _textChangedTimer.Tick += (sender, args) =>
             {
                 SuspendEditorUpdate = true;
-                Text = Editor.Text;
+                SyncText();
                 SuspendEditorUpdate = false;
             };
+        }
+
+        private void SyncText()
+        {
+            Text = Editor.Text;
         }
 
         private void InitializeEditor()
@@ -77,11 +105,14 @@ namespace RazorPad.UI.Editors
                                     _textChangedTimer.Start();
 
                                 };
-            AddChild(Editor);
+            Content = Editor;
         }
 
-        protected void InitializeFolding(AbstractFoldingStrategy foldingStrategy)
+        protected internal void InitializeFolding(AbstractFoldingStrategy foldingStrategy)
         {
+            if (_foldingManager != null)
+                FoldingManager.Uninstall(_foldingManager);
+
             var foldingManager = FoldingManager.Install(Editor.TextArea);
             foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
 
@@ -89,6 +120,8 @@ namespace RazorPad.UI.Editors
             foldingUpdateTimer.Tick += (o, args) => foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
 
             foldingUpdateTimer.Start();
+
+            _foldingManager = foldingManager;
         }
 
 
@@ -105,6 +138,18 @@ namespace RazorPad.UI.Editors
 
             if (codeEditor != null && !codeEditor.SuspendEditorUpdate)
                 codeEditor.Editor.Text = (e.NewValue ?? string.Empty).ToString();
+        }
+
+        static void OnEditorLanguageChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var codeEditor = sender as CodeEditor;
+
+            if (codeEditor == null)
+                return;
+
+            var strategy = _strategies[e.NewValue.ToString()];
+            codeEditor.InitializeEditor();
+            strategy.Apply(codeEditor);
         }
     }
 }

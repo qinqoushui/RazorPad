@@ -59,7 +59,7 @@
 
             <avalonDock:DockingManager.DocumentTemplate>
                 <DataTemplate>
-                    <Editors:RazorCodeEditor Text="{Binding Path=Template}" />
+                    <Editors:CodeEditor Text="{Binding Path=Template}" EditorLanguage="Razor" />
                 </DataTemplate>
             </avalonDock:DockingManager.DocumentTemplate>
             <avalonDock:DockingManager.DocumentHeaderTemplate>

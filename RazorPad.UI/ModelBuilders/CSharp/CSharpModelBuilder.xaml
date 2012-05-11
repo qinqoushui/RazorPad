@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:UI="clr-namespace:RazorPad.UI" xmlns:Editors="clr-namespace:RazorPad.UI.Editors">
 
-    <Editors:CSharpCodeEditor x:Name="ModelEditor" Grid.Row="1"
+    <Editors:CodeEditor x:Name="ModelEditor" Grid.Row="1"
              Text="{Binding Path=CSharp}"
-             AllowDrop="True" />
+             AllowDrop="True" 
+            EditorLanguage="C#" />
 
 </UI:ModelBuilder>

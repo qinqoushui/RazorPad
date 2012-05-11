@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Framework="clr-namespace:RazorPad.UI" xmlns:Editors="clr-namespace:RazorPad.UI.Editors">
 
-        <Editors:JsonCodeEditor x:Name="ModelEditor"
+        <Editors:CodeEditor x:Name="ModelEditor"
              Text="{Binding Path=Json}"
-             AllowDrop="True" />
+             AllowDrop="True"
+             EditorLanguage="JavaScript"/>
 
 </Framework:ModelBuilder>

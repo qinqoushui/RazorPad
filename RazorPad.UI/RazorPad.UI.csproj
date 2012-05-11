@@ -52,10 +52,11 @@
   <ItemGroup>
     <Compile Include="Editors\BraceFoldingStrategy.cs" />
     <Compile Include="Editors\CodeEditor.cs" />
-    <Compile Include="Editors\CSharpCodeEditor.cs" />
-    <Compile Include="Editors\JsonCodeEditor.cs" />
-    <Compile Include="Editors\RazorCodeEditor.cs" />
-    <Compile Include="Editors\XmlCodeEditor.cs" />
+    <Compile Include="Editors\CSharpStrategy.cs" />
+    <Compile Include="Editors\ICodeEditorStrategy.cs" />
+    <Compile Include="Editors\JavaScriptStrategy.cs" />
+    <Compile Include="Editors\RazorStrategy.cs" />
+    <Compile Include="Editors\XmlStrategy.cs" />
     <Compile Include="ModelBuilders\CSharp\CSharpModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\CSharp\CSharpModelBuilderViewModel.cs" />
     <EmbeddedResource Include="ModelBuilders\CSharp\CSharpModelEvaluatorTemplate.cs" />
