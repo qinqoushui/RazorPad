@@ -106,7 +106,9 @@ namespace RazorPad.UI.Editors
                          {
                              ShowLineNumbers = true,
                              FontFamily = new FontFamily("Consolas"),
-                             FontSize = (double)(new FontSizeConverter().ConvertFrom("10pt") ?? 10.0)
+                             FontSize = (double)(new FontSizeConverter().ConvertFrom("10pt") ?? 10.0),
+							 FontStretch = FontStretches.SemiExpanded
+							
                          };
 
             Editor.KeyUp += (sender, args) =>
@@ -169,7 +171,7 @@ namespace RazorPad.UI.Editors
             var fontSize = (double)e.NewValue;
             if (codeEditor != null && fontSize > 0)
             {
-                codeEditor.Editor.FontSize = fontSize;
+                codeEditor.Editor.FontSize = (double)(new FontSizeConverter().ConvertFrom(fontSize + "pt"));
             }
         }
 
