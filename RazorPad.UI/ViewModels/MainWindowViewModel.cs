@@ -268,12 +268,6 @@ namespace RazorPad.ViewModels
         {
             Log.Debug("Adding new template editor (current: {0})...", current);
 
-            templateEditor.OnStatusUpdated += (sender, args) =>
-                                                  {
-                                                      Log.Info(args.Message);
-                                                      StatusMessage = args.Message;
-                                                  };
-
             templateEditor.Messages = Messages;
 
             TemplateEditors.Add(templateEditor);

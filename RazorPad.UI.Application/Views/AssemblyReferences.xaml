@@ -27,9 +27,10 @@
                     <GridViewColumn Width="30">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox IsEnabled="{Binding IsNotReadOnly}" 
+                                <CheckBox Name="Selected" 
+                                          IsEnabled="{Binding IsOptional}" 
                                           IsChecked="{Binding IsInstalled}" 
-                                          Name="Selected" IsThreeState="False" />
+                                          IsThreeState="False" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

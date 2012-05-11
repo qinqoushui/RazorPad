@@ -4,9 +4,9 @@
         xmlns:avalonDock="clr-namespace:AvalonDock;assembly=AvalonDock"
         xmlns:avalonDockLayout="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
         xmlns:avalonDockThemes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2010" 
-        xmlns:Views="clr-namespace:RazorPad.Views" 
-        xmlns:Editors="clr-namespace:RazorPad.UI.Editors;assembly=RazorPad.UI"
         xmlns:AttachedProperties="clr-namespace:RazorPad.UI;assembly=RazorPad.UI" 
+        xmlns:Editors="clr-namespace:RazorPad.UI.Editors;assembly=RazorPad.UI"
+        xmlns:Views="clr-namespace:RazorPad.Views" 
         Title="Razor Pad" Height="700" Width="1000">
     <Window.Resources>
         <avalonDockThemes:VS2010Theme x:Key="VS2010Theme"/>

@@ -10,7 +10,6 @@ using System.Web.Razor;
 using System.Web.Razor.Parser.SyntaxTree;
 using RazorPad.Compilation;
 using RazorPad.Extensions;
-using RazorPad.Framework;
 using RazorPad.UI;
 using RazorPad.UI.ModelBuilders;
 
@@ -24,8 +23,6 @@ namespace RazorPad.ViewModels
         private readonly IDictionary<Type, string> _savedModels;
 
         public ITemplateCompiler TemplateCompiler { get; set; }
-
-        public event EventHandler<EventArgs<string>> OnStatusUpdated;
 
         public string DisplayName
         {
@@ -268,8 +265,6 @@ namespace RazorPad.ViewModels
 
             if (GeneratorResults == null || !GeneratorResults.Success)
             {
-                Log("***  Template Parsing Failed  ***");
-
                 if (GeneratorResults != null)
                 {
                     var viewModels = GeneratorResults.ParserErrors.Select(x => new RazorPadRazorError(x));
@@ -335,16 +330,6 @@ namespace RazorPad.ViewModels
         private void OnTemplateChanged(object sender, EventArgs args)
         {
             Refresh();
-        }
-
-        private void Log(string message)
-        {
-            Messages.WriteLine("[{0}]  {1}", DateTime.Now.ToShortTimeString(), message);
-        }
-
-        private void Log(Exception ex)
-        {
-            Messages.WriteLine("[{0}]  {1}\r\n{2}", DateTime.Now.ToShortTimeString(), ex.Message, ex.StackTrace);
         }
 
         private void UpdateModelProvider(string providerName)

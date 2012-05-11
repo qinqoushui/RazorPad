@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using NLog;
 using NLog.Config;
-using RazorPad.Compilation.Hosts;
 using RazorPad.Providers;
 using RazorPad.UI;
 using RazorPad.UI.Theming;
@@ -17,20 +16,10 @@ namespace RazorPad.Views
     {
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-        private IEnumerable<string> _coreReferences;
-
         protected MainWindowViewModel ViewModel
         {
             get { return (MainWindowViewModel)DataContext; }
             private set { DataContext = value; }
-        }
-
-        protected IEnumerable<string> CoreReferences
-        {
-            get
-            {
-                return _coreReferences ?? (_coreReferences = RazorPadHost.DefaultIncludes.Select(di => di.Location));
-            }
         }
 
         public MainWindow()
@@ -82,7 +71,7 @@ namespace RazorPad.Views
             var assemblyReferences = references.Select(s =>
                 new AssemblyReference(s)
                 {
-                    IsNotReadOnly = !CoreReferences.Contains(s),
+                    IsOptional = true,
                     IsInstalled = true,
                 });
 
@@ -96,7 +85,10 @@ namespace RazorPad.Views
             dlg.ShowDialog();
 
             if (dlg.DialogResult == true)
-                references = dialogDataContext.InstalledReferences.References.Select(reference => reference.Location).ToArray();
+            {
+                var selectedReferences = dialogDataContext.InstalledReferences.References;
+                references = selectedReferences.Select(reference => reference.Location).ToArray();
+            }
 
             return references;
         }

@@ -18,7 +18,7 @@ namespace RazorPad.ViewModels
         public string ProcessorArchitecture { get; set; }
 
         public bool IsStandard;
-        public bool IsNotReadOnly { get; set; }
+        public bool IsOptional { get; set; }
         public bool IsRecent { get; set; }
         
         public bool IsInstalled
@@ -43,7 +43,7 @@ namespace RazorPad.ViewModels
             Version = version;
             Culture = culture;
             PublicKeyToken = publicKeyToken;
-            IsNotReadOnly = true;
+            IsOptional = true;
         }
 
 
@@ -92,7 +92,7 @@ namespace RazorPad.ViewModels
             ProcessorArchitecture = assemblyName.ProcessorArchitecture.ToString();
             FullName = assemblyName.FullName;
             Location = path;
-            IsNotReadOnly = true;
+            IsOptional = true;
 
         }
 
