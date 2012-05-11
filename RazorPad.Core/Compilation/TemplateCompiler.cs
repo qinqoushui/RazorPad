@@ -78,7 +78,7 @@ namespace RazorPad.Compilation
 
             if (compiledCode.Errors.HasErrors)
             {
-                Log.Warn("Compilation FAILED: {0}", compiledCode.Errors.Render());
+                Log.Info("Compilation FAILED: {0}", compiledCode.Errors.Render());
             }
             else
             {

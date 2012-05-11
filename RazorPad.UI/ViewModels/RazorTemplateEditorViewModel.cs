@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Razor;
+using System.Web.Razor.Parser.SyntaxTree;
 using RazorPad.Compilation;
 using RazorPad.Extensions;
 using RazorPad.Framework;
@@ -289,10 +291,25 @@ namespace RazorPad.ViewModels
                     Parse();
                     ExecutedTemplateOutput = TemplateCompiler.Execute(_document);
                 }
+                catch(CodeGenerationException ex)
+                {
+                    Dispatcher.Invoke(new Action(() => {
+                        foreach (RazorError error in ex.GeneratorResults.ParserErrors)
+                            Errors.Add(new RazorPadRazorError(error));
+                    }));
+                }
+                catch (CompilationException ex)
+                {
+                    Dispatcher.Invoke(new Action(() => {
+                        foreach (CompilerError error in ex.CompilerResults.Errors)
+                            Errors.Add(new RazorPadCompilerError(error));
+                    }));
+                }
                 catch (Exception ex)
                 {
-                    Log(ex);
-                    Dispatcher.Invoke(new Action(() => Errors.Add(new RazorPadError(ex))));
+                    Dispatcher.Invoke(new Action(() => 
+                        Errors.Add(new RazorPadError(ex)))
+                    );
                 }
             });
         }
