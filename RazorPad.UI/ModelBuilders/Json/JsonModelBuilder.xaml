@@ -6,6 +6,8 @@
         <Editors:CodeEditor x:Name="ModelEditor"
              Text="{Binding Path=Json}"
              AllowDrop="True"
-             EditorLanguage="JavaScript"/>
+             EditorLanguage="JavaScript"
+             FontSize="{Binding Parent.FontSize}" 
+        />
 
 </Framework:ModelBuilder>

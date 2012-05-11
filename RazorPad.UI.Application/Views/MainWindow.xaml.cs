@@ -35,7 +35,7 @@ namespace RazorPad.Views
 
         public MainWindow()
         {
-            var config = new LoggingConfiguration();
+            var config = XmlLoggingConfiguration.AppConfig ?? new LoggingConfiguration();
 
             var observableWriter = new ObservableTextWriter();
             var textWriterTarget = new TextWriterTarget(observableWriter);

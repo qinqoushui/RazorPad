@@ -6,6 +6,8 @@
     <Editors:CodeEditor x:Name="ModelEditor" Grid.Row="1"
              Text="{Binding Path=CSharp}"
              AllowDrop="True" 
-            EditorLanguage="C#" />
+             EditorLanguage="C#" 
+             FontSize="{Binding Parent.FontSize}" 
+    />
 
 </UI:ModelBuilder>

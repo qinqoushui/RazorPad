@@ -17,6 +17,12 @@ namespace RazorPad.UI.Editors
                 BindsTwoWayByDefault = true,
             });
 
+        public static readonly DependencyProperty EditorFontSizeProperty = DependencyProperty.Register("EditorFontSize",
+            typeof(double), typeof(CodeEditor), new FrameworkPropertyMetadata((double)0, OnEditorFontSizeChanged)
+            {
+                BindsTwoWayByDefault = true,
+            });
+
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text",
             typeof(string), typeof(CodeEditor), new FrameworkPropertyMetadata(string.Empty, OnTextChanged)
             {
@@ -47,6 +53,12 @@ namespace RazorPad.UI.Editors
         public string EditorLanguage
         {
             get { return (string)GetValue(ReadOnlyProperty); }
+            set { SetValue(ReadOnlyProperty, value); }
+        }
+
+        public double EditorFontSize
+        {
+            get { return (double)GetValue(ReadOnlyProperty); }
             set { SetValue(ReadOnlyProperty, value); }
         }
 
@@ -136,8 +148,29 @@ namespace RazorPad.UI.Editors
         {
             var codeEditor = sender as CodeEditor;
 
-            if (codeEditor != null && !codeEditor.SuspendEditorUpdate)
-                codeEditor.Editor.Text = (e.NewValue ?? string.Empty).ToString();
+            if (codeEditor == null || codeEditor.SuspendEditorUpdate) return;
+
+            var text = (e.NewValue ?? string.Empty).ToString();
+
+            codeEditor.Editor.Text = text;
+
+            if (codeEditor.ReadOnly)
+            {
+                var textDocument = codeEditor.Editor.Document;
+                codeEditor.Editor.TextArea.IndentationStrategy.IndentLines(textDocument, 0, textDocument.LineCount);
+                codeEditor.Editor.IsReadOnly = true;
+            }
+        }
+
+        static void OnEditorFontSizeChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var codeEditor = sender as CodeEditor;
+
+            var fontSize = (double)e.NewValue;
+            if (codeEditor != null && fontSize > 0)
+            {
+                codeEditor.Editor.FontSize = fontSize;
+            }
         }
 
         static void OnEditorLanguageChanged(object sender, DependencyPropertyChangedEventArgs e)

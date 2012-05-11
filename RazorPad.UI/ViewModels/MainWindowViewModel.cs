@@ -29,6 +29,8 @@ namespace RazorPad.ViewModels
 
         public ICommand AnchorableCloseCommand { get; private set; }
         public ICommand CloseCommand { get; private set; }
+        public ICommand ExecuteCommand { get; private set; }
+        public ICommand FontSizeCommand { get; private set; }
         public ICommand ManageReferencesCommand { get; private set; }
         public ICommand NewCommand { get; private set; }
         public ICommand OpenCommand { get; private set; }
@@ -91,6 +93,20 @@ namespace RazorPad.ViewModels
             private set;
         }
 
+        public double FontSize
+        {
+            get { return _fontSize; }
+            set
+            {
+                if (_fontSize == value)
+                    return;
+
+                _fontSize = value;
+                OnPropertyChanged("FontSize");
+            }
+        }
+        private double _fontSize = 12;
+
         public string StatusMessage
         {
             get { return _statusMessage; }
@@ -141,10 +157,17 @@ namespace RazorPad.ViewModels
                 () => { /* Ignore */ },
                 () => false);
 
+            ExecuteCommand = new RelayCommand(
+                    p => CurrentTemplate.Execute(),
+                    p => CurrentTemplate != null
+                );
+
             CloseCommand = new RelayCommand(
                     p => Close(CurrentTemplate),
                     p => HasCurrentTemplate
                 );
+
+            FontSizeCommand = new RelayCommand(ChangeFontSize);
 
             ManageReferencesCommand = new RelayCommand(() => {
                 var loadedReferences = CurrentTemplate.AssemblyReferences;
@@ -172,6 +195,22 @@ namespace RazorPad.ViewModels
                     p => SwitchTheme((Theme)p),
                     p => true
                 );
+        }
+
+        private void ChangeFontSize(object param)
+        {
+            var strVal = param.ToString();
+
+            if (strVal == "Increase")
+                FontSize += 2;
+            if (strVal == "Decrease")
+                FontSize -= 2;
+
+            double size;
+            if (double.TryParse(strVal, out size))
+            {
+                FontSize = size;
+            }
         }
 
         private void SwitchTheme(Theme theme)
@@ -236,6 +275,7 @@ namespace RazorPad.ViewModels
                                                   };
 
             templateEditor.Messages = Messages;
+            templateEditor.Parent = this;
 
             TemplateEditors.Add(templateEditor);
 

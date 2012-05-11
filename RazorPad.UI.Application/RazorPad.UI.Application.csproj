@@ -80,24 +80,6 @@
     </ApplicationDefinition>
     <Compile Include="ServiceLocator.cs" />
     <Compile Include="Views\ActiveDocumentConverter.cs" />
-    <Compile Include="Views\Output\BrowserView.xaml.cs">
-      <DependentUpon>BrowserView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Output\SyntaxTreeView.xaml.cs">
-      <DependentUpon>SyntaxTreeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Output\ErrorsView.xaml.cs">
-      <DependentUpon>ErrorsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Output\GeneratedCodeView.xaml.cs">
-      <DependentUpon>GeneratedCodeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Output\MessagesView.xaml.cs">
-      <DependentUpon>MessagesView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Output\SourceView.xaml.cs">
-      <DependentUpon>SourceView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ReferencesDialogWindow.xaml.cs">
       <DependentUpon>ReferencesDialogWindow.xaml</DependentUpon>
     </Compile>
@@ -113,30 +95,6 @@
     <Compile Include="Views\ModelBuilder.xaml.cs">
       <DependentUpon>ModelBuilder.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\Output\BrowserView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Output\SyntaxTreeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Output\ErrorsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Output\GeneratedCodeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Output\MessagesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Output\SourceView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\ReferencesDialogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -176,6 +134,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
