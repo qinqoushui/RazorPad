@@ -107,8 +107,6 @@ namespace RazorPad.UI.Editors
                              ShowLineNumbers = true,
                              FontFamily = new FontFamily("Consolas"),
                              FontSize = (double)(new FontSizeConverter().ConvertFrom("10pt") ?? 10.0),
-							 FontStretch = FontStretches.SemiExpanded
-							
                          };
 
             Editor.KeyUp += (sender, args) =>
