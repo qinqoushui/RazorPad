@@ -275,7 +275,6 @@ namespace RazorPad.ViewModels
                                                   };
 
             templateEditor.Messages = Messages;
-            templateEditor.Parent = this;
 
             TemplateEditors.Add(templateEditor);
 

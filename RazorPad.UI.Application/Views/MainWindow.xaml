@@ -67,7 +67,7 @@
                 <DataTemplate>
                     <Editors:CodeEditor Text="{Binding Template}" 
                                         EditorLanguage="Razor" 
-                                        EditorFontSize="{Binding Parent.FontSize}" 
+                                        EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
                     />
                 </DataTemplate>
             </avalonDock:DockingManager.DocumentTemplate>
@@ -118,7 +118,7 @@
                                                             Text="{Binding ExecutedTemplateOutput}" 
                                                             ReadOnly="True" 
                                                             EditorLanguage="XML" 
-                                                            EditorFontSize="{Binding Parent.FontSize}" 
+                                                            EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
                                         />
                                     </avalonDockLayout:LayoutAnchorable>
 
@@ -127,7 +127,7 @@
                                                             Text="{Binding GeneratedTemplateCode}" 
                                                             ReadOnly="True" 
                                                             EditorLanguage="C#" 
-                                                            EditorFontSize="{Binding Parent.FontSize}" 
+                                                            EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
                                         />
                                     </avalonDockLayout:LayoutAnchorable>
 
@@ -136,7 +136,7 @@
                                             <TextBox DataContext="{Binding CurrentTemplate}"
                                                      Text="{Binding RazorSyntaxTree}" 
                                                      IsReadOnly="True" 
-                                                     FontSize="{Binding Parent.FontSize}" 
+                                                     FontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
                                             />
                                         </ScrollViewer>
                                     </avalonDockLayout:LayoutAnchorable>
@@ -160,7 +160,7 @@
                                             <TextBox Text="{Binding MessageBuffer}" 
                                                      DataContext="{Binding Messages}" 
                                                      IsReadOnly="True" 
-                                                     FontSize="{Binding Parent.FontSize}" 
+                                                     FontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
                                             />
                                         </ScrollViewer>
                                     </avalonDockLayout:LayoutAnchorable>

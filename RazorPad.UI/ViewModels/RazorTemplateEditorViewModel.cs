@@ -228,9 +228,6 @@ namespace RazorPad.ViewModels
                 OnPropertyChanged("IsDirty");
             }
         }
-
-        public MainWindowViewModel Parent { get; set; }
-
         private bool _isDirty;
 
 

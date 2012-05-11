@@ -9,6 +9,8 @@
     <Editors:CodeEditor x:Name="ModelEditor" Grid.Row="1"
              Text="{Binding Path=Xml, UpdateSourceTrigger=Explicit}"
              AllowDrop="True"
-             EditorLanguage="XML" />
+             EditorLanguage="XML"
+             EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+    />
 
 </UI:ModelBuilder>

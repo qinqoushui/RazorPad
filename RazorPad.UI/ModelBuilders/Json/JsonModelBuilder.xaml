@@ -7,7 +7,7 @@
              Text="{Binding Path=Json}"
              AllowDrop="True"
              EditorLanguage="JavaScript"
-             FontSize="{Binding Parent.FontSize}" 
+             EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
         />
 
 </Framework:ModelBuilder>
