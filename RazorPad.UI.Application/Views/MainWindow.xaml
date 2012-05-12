@@ -162,7 +162,7 @@
                                         <ScrollViewer DataContext="{Binding CurrentTemplate}" 
                                                       VerticalScrollBarVisibility="Auto"
                                                       HorizontalScrollBarVisibility="Auto">
-                                            <TextBox Text="{Binding MessageBuffer}" 
+                                            <TextBox x:Name="MessagesOutput" Text="{Binding MessageBuffer}" 
                                                      DataContext="{Binding Messages}" 
                                                      IsReadOnly="True" 
                                                      FontSize="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 

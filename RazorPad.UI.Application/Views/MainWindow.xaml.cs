@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using NLog;
 using NLog.Config;
@@ -52,7 +54,16 @@ namespace RazorPad.Views
 
             InitializeComponent();
 
+            MessagesOutput.TextChanged += ScrollToEnd;
+
             Log.Info("Done initializing");
+        }
+
+        private void ScrollToEnd(object sender, EventArgs args)
+        {
+            var textbox = (TextBox) sender;
+            textbox.CaretIndex = textbox.Text.Length;
+            textbox.ScrollToEnd();
         }
 
         void HandleMouseWheel(object sender, MouseWheelEventArgs e)
