@@ -33,8 +33,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.AvalonEdit">
-      <HintPath>..\packages\AvalonEdit.4.1.0.8000\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=4.1.0.8000, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SharpDevelop\bin\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.AvalonEdit.AddIn">
+      <HintPath>..\..\..\SharpDevelop\AddIns\DisplayBindings\AvalonEdit\ICSharpCode.AvalonEdit.AddIn.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpDevelop">
+      <HintPath>..\..\..\SharpDevelop\bin\ICSharpCode.SharpDevelop.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpDevelop.Dom">
+      <HintPath>..\..\..\SharpDevelop\bin\ICSharpCode.SharpDevelop.Dom.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NLog">
@@ -55,6 +65,32 @@
     <Compile Include="Editors\BraceFoldingStrategy.cs" />
     <Compile Include="Editors\CodeEditor.cs" />
     <Compile Include="Editors\CSharpStrategy.cs" />
+    <Compile Include="Editors\Folding\CharacterReader.cs" />
+    <Compile Include="Editors\Folding\CSharpRazorLanguageBinding.cs" />
+    <Compile Include="Editors\Folding\FoldGenerationTimer.cs" />
+    <Compile Include="Editors\Folding\FoldGenerator.cs" />
+    <Compile Include="Editors\Folding\HtmlElementFold.cs" />
+    <Compile Include="Editors\Folding\HtmlFoldParser.cs" />
+    <Compile Include="Editors\Folding\HtmlLanguageBinding.cs" />
+    <Compile Include="Editors\Folding\HtmlNode.cs" />
+    <Compile Include="Editors\Folding\HtmlReader.cs" />
+    <Compile Include="Editors\Folding\IFoldGenerationTimer.cs" />
+    <Compile Include="Editors\Folding\IFoldGenerator.cs" />
+    <Compile Include="Editors\Folding\IFoldGeneratorFactory.cs" />
+    <Compile Include="Editors\Folding\IFoldParser.cs" />
+    <Compile Include="Editors\Folding\IHtmlReaderFactory.cs" />
+    <Compile Include="Editors\Folding\ITextEditorWithParseInformationFolding.cs" />
+    <Compile Include="Editors\Folding\ITextEditorWithParseInformationFoldingFactory.cs" />
+    <Compile Include="Editors\Folding\RazorFoldGeneratorFactory.cs" />
+    <Compile Include="Editors\Folding\RazorHtmlFoldParser.cs" />
+    <Compile Include="Editors\Folding\RazorHtmlReader.cs" />
+    <Compile Include="Editors\Folding\RazorHtmlReaderFactory.cs" />
+    <Compile Include="Editors\Folding\RazorHtmlSpans.cs" />
+    <Compile Include="Editors\Folding\RazorMarkupCharacterReader.cs" />
+    <Compile Include="Editors\Folding\ScheduledFoldGenerator.cs" />
+    <Compile Include="Editors\Folding\TextEditorWithParseInformationFolding.cs" />
+    <Compile Include="Editors\Folding\TextEditorWithParseInformationFoldingFactory.cs" />
+    <Compile Include="Editors\Folding\VisualBasicRazorLanguageBinding.cs" />
     <Compile Include="Editors\ICodeEditorStrategy.cs" />
     <Compile Include="Editors\JavaScriptStrategy.cs" />
     <Compile Include="Editors\RazorStrategy.cs" />
