@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Folding;
+using RazorPad.UI.Editors.CodeCompletion;
 
 namespace RazorPad.UI.Editors
 {
@@ -48,7 +49,7 @@ namespace RazorPad.UI.Editors
 
         private FoldingManager _foldingManager;
 
-        public TextEditor Editor { get; private set; }
+        public CodeCompletionTextEditor Editor { get; private set; }
 
         public string EditorLanguage
         {
@@ -102,7 +103,7 @@ namespace RazorPad.UI.Editors
 
         private void InitializeEditor()
         {
-            Editor = new TextEditor
+            Editor = new CodeCompletionTextEditor
                          {
                              ShowLineNumbers = true,
                              FontFamily = new FontFamily("Consolas"),

@@ -1,10 +1,14 @@
 ﻿// Copyright (c) AlphaSierraPapa for the SharpDevelop Team (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
-namespace RazorPad.UI.Editors.Folding
+namespace RazorPad.UI.Editors.CodeCompletion
 {
-	public interface IFoldGeneratorFactory
+	/// <summary>
+	/// An item in the insight window.
+	/// </summary>
+	public interface IInsightItem
 	{
-		IFoldGenerator CreateFoldGenerator(ITextEditorWithParseInformationFolding textEditor);
+		object Header { get; }
+		object Content { get; }
 	}
 }

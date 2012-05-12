@@ -37,15 +37,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SharpDevelop\bin\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.AvalonEdit.AddIn">
-      <HintPath>..\..\..\SharpDevelop\AddIns\DisplayBindings\AvalonEdit\ICSharpCode.AvalonEdit.AddIn.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpDevelop">
-      <HintPath>..\..\..\SharpDevelop\bin\ICSharpCode.SharpDevelop.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpDevelop.Dom">
-      <HintPath>..\..\..\SharpDevelop\bin\ICSharpCode.SharpDevelop.Dom.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
@@ -56,22 +47,37 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editors\AggregatedLanguageBinding.cs" />
+    <Compile Include="Editors\AvalonEditDocumentAdapter.cs" />
+    <Compile Include="Editors\AvalonEditTextSourceAdapter.cs" />
     <Compile Include="Editors\BraceFoldingStrategy.cs" />
+    <Compile Include="Editors\CodeCompletion\CodeCompletionEditorAdapter.cs" />
+    <Compile Include="Editors\CodeCompletion\CodeCompletionTextEditor.cs" />
+    <Compile Include="Editors\CodeCompletion\CompletionContext.cs" />
+    <Compile Include="Editors\CodeCompletion\ICompletionItem.cs" />
+    <Compile Include="Editors\CodeCompletion\ICompletionItemList.cs" />
+    <Compile Include="Editors\CodeCompletion\ICompletionListWindow.cs" />
+    <Compile Include="Editors\CodeCompletion\ICompletionWindow.cs" />
+    <Compile Include="Editors\CodeCompletion\IInsightItem.cs" />
+    <Compile Include="Editors\CodeCompletion\IInsightWindow.cs" />
+    <Compile Include="Editors\CodeCompletion\CodeCompletionWindow.cs" />
+    <Compile Include="Editors\CodeCompletion\StringToVisibilityConverter.cs" />
     <Compile Include="Editors\CodeEditor.cs" />
-    <Compile Include="Editors\CSharpStrategy.cs" />
-    <Compile Include="Editors\Folding\CharacterReader.cs" />
     <Compile Include="Editors\Folding\CSharpRazorLanguageBinding.cs" />
+    <Compile Include="Editors\CSharpStrategy.cs" />
+    <Compile Include="Editors\DocumentUtilitites.cs" />
+    <Compile Include="Editors\Folding\AvalonEditTextEditorAdapter.cs" />
+    <Compile Include="Editors\Folding\CharacterReader.cs" />
     <Compile Include="Editors\Folding\FoldGenerationTimer.cs" />
-    <Compile Include="Editors\Folding\FoldGenerator.cs" />
     <Compile Include="Editors\Folding\HtmlElementFold.cs" />
     <Compile Include="Editors\Folding\HtmlFoldParser.cs" />
-    <Compile Include="Editors\Folding\HtmlLanguageBinding.cs" />
     <Compile Include="Editors\Folding\HtmlNode.cs" />
     <Compile Include="Editors\Folding\HtmlReader.cs" />
     <Compile Include="Editors\Folding\IFoldGenerationTimer.cs" />
@@ -79,21 +85,33 @@
     <Compile Include="Editors\Folding\IFoldGeneratorFactory.cs" />
     <Compile Include="Editors\Folding\IFoldParser.cs" />
     <Compile Include="Editors\Folding\IHtmlReaderFactory.cs" />
+    <Compile Include="Editors\Folding\ITextEditor.cs" />
     <Compile Include="Editors\Folding\ITextEditorWithParseInformationFolding.cs" />
+    <Compile Include="Editors\Folding\FoldGenerator.cs" />
     <Compile Include="Editors\Folding\ITextEditorWithParseInformationFoldingFactory.cs" />
-    <Compile Include="Editors\Folding\RazorFoldGeneratorFactory.cs" />
     <Compile Include="Editors\Folding\RazorHtmlFoldParser.cs" />
     <Compile Include="Editors\Folding\RazorHtmlReader.cs" />
     <Compile Include="Editors\Folding\RazorHtmlReaderFactory.cs" />
     <Compile Include="Editors\Folding\RazorHtmlSpans.cs" />
     <Compile Include="Editors\Folding\RazorMarkupCharacterReader.cs" />
     <Compile Include="Editors\Folding\ScheduledFoldGenerator.cs" />
-    <Compile Include="Editors\Folding\TextEditorWithParseInformationFolding.cs" />
     <Compile Include="Editors\Folding\TextEditorWithParseInformationFoldingFactory.cs" />
-    <Compile Include="Editors\Folding\VisualBasicRazorLanguageBinding.cs" />
+    <Compile Include="Editors\IBracketSearcher.cs" />
     <Compile Include="Editors\ICodeEditorStrategy.cs" />
+    <Compile Include="Editors\IDocument.cs" />
+    <Compile Include="Editors\IDocumentLine.cs" />
+    <Compile Include="Editors\IFormattingStrategy.cs" />
+    <Compile Include="Editors\IImage.cs" />
+    <Compile Include="Editors\ITextAnchor.cs" />
+    <Compile Include="Editors\ITextBuffer.cs" />
+    <Compile Include="Editors\Location.cs" />
+    <Compile Include="Editors\Folding\RazorFoldGeneratorFactory.cs" />
+    <Compile Include="Editors\Services\ILanguageBinding.cs" />
     <Compile Include="Editors\JavaScriptStrategy.cs" />
     <Compile Include="Editors\RazorStrategy.cs" />
+    <Compile Include="Editors\Folding\TextEditorWithParseInformationFolding.cs" />
+    <Compile Include="Editors\Services\LanguageProperties.cs" />
+    <Compile Include="Editors\TextChangeEventArgs.cs" />
     <Compile Include="Editors\XmlStrategy.cs" />
     <Compile Include="ModelBuilders\CSharp\CSharpModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\CSharp\CSharpModelBuilderViewModel.cs" />
@@ -149,6 +167,7 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\CSharpRazor.xshd" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

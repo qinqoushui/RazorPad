@@ -6,6 +6,8 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Indentation;
 using System.Linq;
+using RazorPad.UI.Editors.CodeCompletion;
+using RazorPad.UI.Editors.Folding;
 
 namespace RazorPad.UI.Editors
 {
@@ -14,8 +16,14 @@ namespace RazorPad.UI.Editors
         public void Apply(CodeEditor editor)
         {
             editor.Editor.TextArea.IndentationStrategy = new DefaultIndentationStrategy();
-            editor.InitializeFolding(new XmlFoldingStrategy());
+            //editor.InitializeFolding(new XmlFoldingStrategy());
             editor.Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("CSharpRazor") ?? LoadCSharpRazorDefinition();
+
+            var cSharpRazorLanguageBinding = new CSharpRazorLanguageBinding(new TextEditorWithParseInformationFoldingFactory(),
+                                                    new RazorFoldGeneratorFactory(".cshtml"));
+
+            cSharpRazorLanguageBinding.Attach(new CodeCompletionEditorAdapter(editor.Editor));
+
         }
 
         private IHighlightingDefinition LoadCSharpRazorDefinition()
