@@ -159,11 +159,13 @@
                                     </avalonDockLayout:LayoutAnchorable>
 
                                     <avalonDockLayout:LayoutAnchorable x:Name="MessagesTab" Title="Messages" >
-                                        <ScrollViewer DataContext="{Binding CurrentTemplate}" HorizontalScrollBarVisibility="Auto">
+                                        <ScrollViewer DataContext="{Binding CurrentTemplate}" 
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      HorizontalScrollBarVisibility="Auto">
                                             <TextBox Text="{Binding MessageBuffer}" 
                                                      DataContext="{Binding Messages}" 
                                                      IsReadOnly="True" 
-                                                     FontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                                     FontSize="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
                                             />
                                         </ScrollViewer>
                                     </avalonDockLayout:LayoutAnchorable>
