@@ -24,6 +24,20 @@ namespace RazorPad.ViewModels
 
         public ITemplateCompiler TemplateCompiler { get; set; }
 
+        public bool AutoExecute
+        {
+            get { return _autoExecute; }
+            set
+            {
+                if (_autoExecute == value)
+                    return;
+
+                _autoExecute = value;
+                OnPropertyChanged("AutoExecute");
+            }
+        }
+        private bool _autoExecute;
+
         public string DisplayName
         {
             get
@@ -313,7 +327,9 @@ namespace RazorPad.ViewModels
             ExecutedTemplateOutput = string.Empty;
             GeneratedTemplateCode = string.Empty;
             UpdateIsDirty();
-            Execute();
+
+            if (AutoExecute)
+                Execute();
         }
 
         private void UpdateIsDirty()

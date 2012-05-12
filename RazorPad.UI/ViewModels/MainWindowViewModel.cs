@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -20,7 +21,7 @@ namespace RazorPad.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         protected static readonly double DefaultFontSize = 
-            double.Parse(System.Configuration.ConfigurationManager.AppSettings["FontSize"] ?? "12");
+            double.Parse(ConfigurationManager.AppSettings["FontSize"] ?? "12");
 
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -110,6 +111,29 @@ namespace RazorPad.ViewModels
         }
         private double _fontSize;
 
+        public bool AutoExecute
+        {
+            get { return _autoExecute; }
+            set
+            {
+                if (_autoExecute == value)
+                    return;
+
+                _autoExecute = value;
+
+                if (TemplateEditors != null)
+                {
+                    foreach (var editor in TemplateEditors)
+                    {
+                        editor.AutoExecute = value;
+                    }
+                }
+
+                OnPropertyChanged("AutoExecute");
+            }
+        }
+        private bool _autoExecute;
+
         public string StatusMessage
         {
             get { return _statusMessage; }
@@ -148,6 +172,7 @@ namespace RazorPad.ViewModels
             _modelBuilders = modelBuilders;
             _modelProviders = modelProviders;
 
+            AutoExecute = bool.Parse(ConfigurationManager.AppSettings["AutoExecute"] ?? "true");
             FontSize = DefaultFontSize;
             TemplateEditors = new ObservableCollection<RazorTemplateEditorViewModel>();
 
@@ -274,6 +299,7 @@ namespace RazorPad.ViewModels
         {
             Log.Debug("Adding new template editor (current: {0})...", current);
 
+            templateEditor.AutoExecute = AutoExecute;
             templateEditor.Messages = Messages;
 
             TemplateEditors.Add(templateEditor);

@@ -39,7 +39,10 @@
                 <MenuItem Header="_Save" Command="{Binding SaveCommand}" />
                 <MenuItem Header="Save _As..." Command="{Binding SaveAsCommand}" />
             </MenuItem>
-            <MenuItem Header="_Execute" Command="{Binding ExecuteCommand}" />
+            <MenuItem Header="_Execution">
+                <MenuItem Header="Automatic" IsCheckable="True" IsChecked="{Binding AutoExecute}" ToolTip="Automatically execute when template text changes" />
+                <MenuItem Header="E_xecute" Command="{Binding ExecuteCommand}" />
+            </MenuItem>
             <MenuItem Header="_References">
                 <MenuItem Header="Manage _References..." Command="{Binding ManageReferencesCommand}" />
             </MenuItem>
