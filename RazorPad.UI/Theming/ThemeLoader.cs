@@ -9,12 +9,12 @@ namespace RazorPad.UI.Theming
     [Export(typeof(ThemeLoader))]
     public class ThemeLoader
     {
-        public List<Theme> LoadThemes(string selectedTheme = null)
+        public IEnumerable<Theme> LoadThemes(string selectedTheme = null)
         {
             var themeDirectory = Path.Combine(Environment.CurrentDirectory, "themes");
 
-            if (string.IsNullOrWhiteSpace(themeDirectory))
-                return new List<Theme>();
+            if (!Directory.Exists(themeDirectory))
+                return Enumerable.Empty<Theme>();
 
             var themes =
                 from file in Directory.GetFiles(themeDirectory, "*.xaml")
@@ -26,8 +26,8 @@ namespace RazorPad.UI.Theming
                                Name = name,
                                Selected = selected,
                            };
-
-            return themes.ToList();
+            
+            return themes;
         }
     }
 }
