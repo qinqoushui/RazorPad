@@ -20,7 +20,7 @@ namespace RazorPad.Persistence
 
             document.DocumentKind = RazorDocument.GetDocumentKind(filename);
 
-            using (var stream = File.Open(destination, FileMode.Truncate, FileAccess.Write))
+            using (var stream = File.Open(destination, FileMode.Create, FileAccess.Write))
             {
                 saver.Save(document, stream);
 
