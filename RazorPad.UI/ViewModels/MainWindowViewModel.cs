@@ -19,7 +19,8 @@ namespace RazorPad.ViewModels
     [Export]
     public class MainWindowViewModel : ViewModelBase
     {
-        protected const double DefaultFontSize = 12;
+        protected static readonly double DefaultFontSize = 
+            double.Parse(System.Configuration.ConfigurationManager.AppSettings["FontSize"] ?? "12");
 
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
