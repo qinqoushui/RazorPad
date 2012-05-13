@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using NLog;
 using NLog.Config;
+using RazorPad.Compilation.Hosts;
 using RazorPad.Providers;
 using RazorPad.UI;
 using RazorPad.UI.Theming;
@@ -39,6 +40,9 @@ namespace RazorPad.Views
             Log.Info("Initializing application...");
 
             ServiceLocator.Initialize();
+
+            RazorPadHost.AddGlobalImport("RazorPad");
+            RazorPadHost.AddGlobalImport("RazorPad.Compilation");
 
             var themeLoader = ServiceLocator.Get<ThemeLoader>();
             var themes = themeLoader.LoadThemes();
