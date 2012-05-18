@@ -15,22 +15,26 @@ namespace RazorPad
 
         internal static CompositionContainer Container { get; private set; }
 
-        public static void Initialize()
+        public static void Initialize(params string[] assemblyNames)
+        {
+            var assemblies = assemblyNames.Select(Assembly.Load);
+            Initialize(assemblies.ToArray());
+        }
+
+        public static void Initialize(params Assembly[] assemblies)
         {
             if(Container != null)
                 return;
 
             Log.Info("Initializing Service Locator...");
 
-            var assemblies = new AggregateCatalog(
-                    new AssemblyCatalog(Assembly.Load("RazorPad.Core")),
-                    new AssemblyCatalog(Assembly.Load("RazorPad.UI")),
-                    new AssemblyCatalog(Assembly.Load("RazorPad"))
+            var assemblyCatalogs = new AggregateCatalog(
+                    assemblies.Select(x => new AssemblyCatalog(x))
                 );
 
             var plugins = GetPluginsCatalog();
 
-            Container = new CompositionContainer(new AggregateCatalog(assemblies, plugins));
+            Container = new CompositionContainer(new AggregateCatalog(assemblyCatalogs, plugins));
 
             Log.Info("Service Locator initialized");
         }

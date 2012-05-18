@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="AssemblyReference\StandardDotNetReferencesLocatorTests.cs" />
     <Compile Include="ModelBuilders\ModelBuilderFactoryTests.cs" />
+    <Compile Include="ServiceLocatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

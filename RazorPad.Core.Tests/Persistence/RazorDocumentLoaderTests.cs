@@ -12,7 +12,7 @@ namespace RazorPad.Core.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _manager = new RazorDocumentManager(new XmlRazorDocumentSource());
+            _manager = new RazorDocumentManager(new[] { new XmlRazorDocumentSource() });
         }
 
         [TestMethod]

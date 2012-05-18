@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,12 +10,52 @@ using System.Xml.Linq;
 
 namespace RazorPad.Persistence
 {
-    [Export]
-    public class XmlRazorDocumentSource : IRazorDocumentLoader, IRazorDocumentSaver
+    [Export(typeof(IRazorDocumentSource))]
+    public class XmlRazorDocumentSource : IRazorDocumentSource
     {
+        private static readonly IList<string> Extensions =
+            new List<string> { ".razorpad", ".xml" };
+
         private readonly ModelProviders _modelProviderFactory;
 
         public Encoding Encoding { get; set; }
+
+        public bool CanLoad(string uri)
+        {
+            if (string.IsNullOrWhiteSpace(uri))
+                return false;
+
+            return Extensions.Any(x => uri.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool CanLoad(Stream stream)
+        {
+            if (stream == null || !stream.CanRead)
+                return false;
+
+            var reader = new StreamReader(stream, Encoding);
+            var firstLine = reader.ReadLine() ?? string.Empty;
+            
+            stream.Seek(0, SeekOrigin.Begin);
+
+            return firstLine.Contains("<? xml") || firstLine.Contains("<RazorDocument>");
+        }
+
+        public bool CanSave(RazorDocument document, string uri)
+        {
+            if (document == null)
+                return false;
+
+            return CanLoad(uri);
+        }
+
+        public bool CanSave(RazorDocument document, Stream stream)
+        {
+            if (document == null || stream == null || !stream.CanRead)
+                return false;
+
+            return CanSave(document, document.Filename);
+        }
 
         [ImportingConstructor]
         public XmlRazorDocumentSource(ModelProviders modelProviderFactory = null)
@@ -41,6 +83,27 @@ namespace RazorPad.Persistence
             return Load(source);
         }
 
+        public void Save(RazorDocument document, string uri)
+        {
+            var destination = uri ?? document.Filename;
+
+            if (string.IsNullOrWhiteSpace(destination))
+                throw new ApplicationException("No filename specified!");
+
+            document.DocumentKind = RazorDocument.GetDocumentKind(uri);
+
+            using (var stream = File.Open(destination, FileMode.Create, FileAccess.Write))
+            {
+                Save(document, stream);
+
+                try { stream.Flush(); }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine("Error flushing file stream: " + ex);
+                }
+            }
+        }
+
         public RazorDocument Load(XDocument source)
         {
             if(source == null || source.Root == null)
@@ -65,7 +128,6 @@ namespace RazorPad.Persistence
 
             return new RazorDocument(templateEl.Value, references, modelProvider, metadata);
         }
-
 
         public void Save(RazorDocument document, Stream stream)
         {

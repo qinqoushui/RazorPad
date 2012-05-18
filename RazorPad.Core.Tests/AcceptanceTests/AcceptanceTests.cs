@@ -14,7 +14,7 @@ namespace RazorPad.Core.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _loader = new RazorDocumentManager(new XmlRazorDocumentSource());
+            _loader = new RazorDocumentManager(new [] { new XmlRazorDocumentSource() });
             _templateCompiler = new TemplateCompiler();
         }
 

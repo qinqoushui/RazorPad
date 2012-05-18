@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -39,7 +40,7 @@ namespace RazorPad.Views
 
             Log.Info("Initializing application...");
 
-            ServiceLocator.Initialize();
+            ServiceLocator.Initialize("RazorPad", "RazorPad.UI", "RazorPad.Core");
 
             RazorPadHost.AddGlobalImport("RazorPad");
             RazorPadHost.AddGlobalImport("RazorPad.Compilation");

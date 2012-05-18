@@ -97,6 +97,7 @@
     <Compile Include="Framework\SimpleName.cs" />
     <Compile Include="Model\ModelProviderFactory.cs" />
     <Compile Include="Persistence\RazorDocumentManager.cs" />
+    <Compile Include="Persistence\RazorTemplateFileSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Compilation\TemplateBase.cs" />
     <Compile Include="Persistence\XmlRazorDocumentSource.cs" />

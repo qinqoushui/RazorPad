@@ -1,26 +1,51 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace RazorPad.Persistence
 {
     [Export]
-    public class RazorDocumentManager : IRazorDocumentLoader, IRazorDocumentSaver
+    public class RazorDocumentManager : IRazorDocumentSource
     {
-        private readonly XmlRazorDocumentSource _xmlDataSource;
+        private readonly IEnumerable<IRazorDocumentSource> _documentSources;
 
-        public Encoding Encoding
-        {
-            get { return _xmlDataSource.Encoding; }
-            set { _xmlDataSource.Encoding = value; }
-        }
+        public Encoding Encoding { get; set; }
 
         [ImportingConstructor]
-        public RazorDocumentManager(XmlRazorDocumentSource xmlLoader)
+        public RazorDocumentManager([ImportMany]IEnumerable<IRazorDocumentSource> documentSources)
         {
-            _xmlDataSource = xmlLoader ?? new XmlRazorDocumentSource();
+            _documentSources = (documentSources ?? Enumerable.Empty<IRazorDocumentSource>());
+
+            // Always add the plain Razor Template file source at the end of the list
+            _documentSources = _documentSources.Union(new [] { new RazorTemplateFileSource() });
+
+            Encoding = Encoding.UTF8;
         }
+
+        public bool CanLoad(string uri)
+        {
+            return _documentSources.Any(x => x.CanLoad(uri));
+        }
+
+        public bool CanLoad(Stream stream)
+        {
+            return _documentSources.Any(x => x.CanLoad(stream));
+        }
+
+        public bool CanSave(RazorDocument document, string uri)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CanSave(RazorDocument document, Stream stream)
+        {
+            return _documentSources.Any(x => x.CanSave(document, stream));
+        }
+
 
         public RazorDocument Parse(string content)
         {
@@ -28,46 +53,51 @@ namespace RazorPad.Persistence
                 return Load(stream);
         }
 
+
         public RazorDocument Load(string uri)
         {
-            using (var stream = File.OpenRead(uri))
-            {
-                var document = Load(stream);
-                document.Filename = uri;
-                return document;
-            }
+            var source = _documentSources.FirstOrDefault(x => x.CanLoad(uri));
+
+            if (source == null)
+                throw new RazorDocumentSourceNotFoundException();
+
+            return source.Load(uri);
         }
 
         public RazorDocument Load(Stream stream)
         {
-            var reader = new StreamReader(stream, Encoding);
-            var firstLine = reader.ReadLine() ?? string.Empty;
-            
-            stream.Seek(0, SeekOrigin.Begin);
+            var source = _documentSources.FirstOrDefault(x => x.CanLoad(stream));
 
-            if(firstLine.Contains("<? xml") || firstLine.Contains("<RazorDocument>"))
-            {
-                return _xmlDataSource.Load(stream);
-            }
+            if (source == null)
+                throw new RazorDocumentSourceNotFoundException();
 
-            return new RazorDocument(new StreamReader(stream, Encoding).ReadToEnd());
+            return source.Load(stream);
+        }
+
+        public void Save(RazorDocument document, string uri)
+        {
+            var source = _documentSources.FirstOrDefault(x => x.CanSave(document, uri));
+            source = source ?? _documentSources.LastOrDefault();
+
+            if (source == null)
+                throw new RazorDocumentSourceNotFoundException();
+
+            source.Save(document, uri);
         }
 
         public void Save(RazorDocument document, Stream stream)
         {
-            if (document.DocumentKind == RazorDocumentKind.TemplateOnly)
-            {
-                SavePlainRazorTemplate(document, stream);
-                return;
-            }
+            var source = _documentSources.FirstOrDefault(x => x.CanSave(document, stream));
+            source = source ?? _documentSources.LastOrDefault();
 
-            _xmlDataSource.Save(document, stream);
-        }
+            if (source == null)
+                throw new RazorDocumentSourceNotFoundException();
 
-        private static void SavePlainRazorTemplate(RazorDocument document, Stream stream)
-        {
-            using (var writer = new StreamWriter(stream))
-                writer.Write(document.Template);
+            source.Save(document, stream);
         }
+    }
+
+    public class RazorDocumentSourceNotFoundException : Exception
+    {
     }
 }

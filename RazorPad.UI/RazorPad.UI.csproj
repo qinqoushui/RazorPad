@@ -124,6 +124,7 @@
     <Compile Include="ModelBuilders\ModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\ModelBuilders.cs" />
     <Compile Include="ModelBuilders\ModelBuilderViewModel.cs" />
+    <Compile Include="ServiceLocator.cs" />
     <Compile Include="Theming\Theme.cs" />
     <Compile Include="Theming\ThemeLoader.cs" />
     <Compile Include="Util\BrowseBehavior.cs" />
