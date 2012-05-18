@@ -46,11 +46,13 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AvalonDock">
-      <HintPath>..\packages\AvalonDock.2.0.0345\lib\net40\AvalonDock.dll</HintPath>
+    <Reference Include="AvalonDock, Version=2.0.566.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AvalonDock.2.0.795\lib\net40\AvalonDock.dll</HintPath>
     </Reference>
-    <Reference Include="AvalonDock.Themes.VS2010">
-      <HintPath>..\packages\AvalonDock.2.0.0345\lib\net40\AvalonDock.Themes.VS2010.dll</HintPath>
+    <Reference Include="AvalonDock.Themes.VS2010, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AvalonDock.2.0.795\lib\net40\AvalonDock.Themes.VS2010.dll</HintPath>
     </Reference>
     <Reference Include="CustomMarshalers" />
     <Reference Include="ICSharpCode.AvalonEdit">
@@ -82,6 +84,7 @@
     <Compile Include="Views\DocumentLocator.xaml.cs">
       <DependentUpon>DocumentLocator.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\PanesTemplateSelector.cs" />
     <Compile Include="Views\ReferencesDialogWindow.xaml.cs">
       <DependentUpon>ReferencesDialogWindow.xaml</DependentUpon>
     </Compile>

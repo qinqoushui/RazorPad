@@ -6,7 +6,7 @@
         xmlns:avalonDockThemes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2010" 
         xmlns:AttachedProperties="clr-namespace:RazorPad.UI;assembly=RazorPad.UI" 
         xmlns:Editors="clr-namespace:RazorPad.UI.Editors;assembly=RazorPad.UI"
-        xmlns:Views="clr-namespace:RazorPad.Views" 
+        xmlns:Views="clr-namespace:RazorPad.Views"
         Title="Razor Pad" Height="700" Width="1000">
     <Window.Resources>
         <avalonDockThemes:VS2010Theme x:Key="VS2010Theme"/>
@@ -61,20 +61,21 @@
 
         <avalonDock:DockingManager x:Name="dockManager" Grid.Row="1"
                                    ActiveContent="{Binding CurrentTemplate, Mode=TwoWay, Converter={Views:ActiveDocumentConverter}}"
-                                   DocumentCloseCommand="{Binding CloseCommand}"
                                    DocumentsSource="{Binding TemplateEditors}"
-                                   AnchorableCloseCommand="{Binding AnchorableCloseCommand}"
-                                   AnchorableHideCommand="{Binding AnchorableCloseCommand}"
                                    Theme="{StaticResource VS2010Theme}">
 
-            <avalonDock:DockingManager.DocumentTemplate>
-                <DataTemplate>
-                    <Editors:CodeEditor Text="{Binding Template}" 
+            <avalonDock:DockingManager.LayoutItemTemplateSelector>
+                <Views:PanesTemplateSelector>
+                    <Views:PanesTemplateSelector.DocumentEditorTemplate>
+                        <DataTemplate>
+                            <Editors:CodeEditor Text="{Binding Template}" 
                                         EditorLanguage="Razor" 
                                         EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
-                    />
-                </DataTemplate>
-            </avalonDock:DockingManager.DocumentTemplate>
+                            />
+                        </DataTemplate>
+                    </Views:PanesTemplateSelector.DocumentEditorTemplate>
+                </Views:PanesTemplateSelector>
+            </avalonDock:DockingManager.LayoutItemTemplateSelector>
             <avalonDock:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path=Content.DisplayName}"/>
