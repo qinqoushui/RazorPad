@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AvalonDock.Layout.Serialization;
 using NLog;
 using NLog.Config;
 using RazorPad.Compilation.Hosts;
@@ -58,7 +59,7 @@ namespace RazorPad.Views
 
             InitializeComponent();
 
-            MessagesOutput.TextChanged += ScrollToEnd;
+            Layout.Deserialize(dockManager, DefaultLayout);
 
             Log.Info("Done initializing");
         }
@@ -122,6 +123,16 @@ namespace RazorPad.Views
             }
 
             return references;
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            Layout.Serialize(dockManager);
+        }
+
+        private void OnLayoutChanged(object sender, EventArgs e)
+        {
+            Layout.Serialize(dockManager);
         }
     }
 }

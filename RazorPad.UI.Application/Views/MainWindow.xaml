@@ -65,16 +65,85 @@
                                    Theme="{StaticResource VS2010Theme}">
 
             <avalonDock:DockingManager.LayoutItemTemplateSelector>
-                <Views:PanesTemplateSelector>
-                    <Views:PanesTemplateSelector.DocumentEditorTemplate>
+                <Views:RazorPadLayout x:Name="Layout">
+                  <Views:RazorPadLayout.BrowserViewTemplate>
+                    <DataTemplate>
+                      <WebBrowser DataContext="{Binding CurrentTemplate}"
+                                  AttachedProperties:BrowseBehavior.Html="{Binding ExecutedTemplateOutput}" 
+                            />
+                    </DataTemplate>
+                  </Views:RazorPadLayout.BrowserViewTemplate>
+                  <Views:RazorPadLayout.DocumentEditorTemplate>
                         <DataTemplate>
                             <Editors:CodeEditor Text="{Binding Template}" 
                                         EditorLanguage="Razor" 
                                         EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
                             />
                         </DataTemplate>
-                    </Views:PanesTemplateSelector.DocumentEditorTemplate>
-                </Views:PanesTemplateSelector>
+                    </Views:RazorPadLayout.DocumentEditorTemplate>
+                    <Views:RazorPadLayout.ErrorsTemplate>
+                        <DataTemplate>
+                            <DataGrid DataContext="{Binding CurrentTemplate}"
+                                      ItemsSource="{Binding Errors}" 
+                                      AllowDrop="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      IsManipulationEnabled="False"
+                                      IsReadOnly="True"
+                            />
+                        </DataTemplate>
+                    </Views:RazorPadLayout.ErrorsTemplate>
+                    <Views:RazorPadLayout.GeneratedCodeTemplate>
+                      <DataTemplate>
+                            <Editors:CodeEditor DataContext="{Binding CurrentTemplate}"
+                                                Text="{Binding GeneratedTemplateCode}" 
+                                                ReadOnly="True" 
+                                                EditorLanguage="C#" 
+                                                EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                            />
+                        </DataTemplate>
+                  </Views:RazorPadLayout.GeneratedCodeTemplate>
+                  <Views:RazorPadLayout.MessagesTemplate>
+                      <DataTemplate>
+                            <ScrollViewer DataContext="{Binding CurrentTemplate}" 
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Auto">
+                                <TextBox Text="{Binding MessageBuffer}" 
+                                         DataContext="{Binding Messages}" 
+                                         IsReadOnly="True" 
+                                         FontSize="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                         TextChanged="ScrollToEnd"
+                                />
+                            </ScrollViewer>
+                        </DataTemplate>
+                  </Views:RazorPadLayout.MessagesTemplate>
+                  <Views:RazorPadLayout.ModelBuilderTemplate>
+                    <DataTemplate>
+                      <Views:ModelBuilder DataContext="{Binding CurrentTemplate}" Background="Gainsboro" />
+                    </DataTemplate>
+                  </Views:RazorPadLayout.ModelBuilderTemplate>
+                  <Views:RazorPadLayout.SourceViewTemplate>
+                        <DataTemplate>
+                            <Editors:CodeEditor DataContext="{Binding CurrentTemplate}"
+                                                Text="{Binding ExecutedTemplateOutput}" 
+                                                ReadOnly="True" 
+                                                EditorLanguage="XML" 
+                                                EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                            />
+                        </DataTemplate>
+                    </Views:RazorPadLayout.SourceViewTemplate>
+                    <Views:RazorPadLayout.SyntaxTreeTemplate>
+                        <DataTemplate>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                <TextBox DataContext="{Binding CurrentTemplate}"
+                                         Text="{Binding RazorSyntaxTree}" 
+                                         IsReadOnly="True" 
+                                         FontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                />
+                            </ScrollViewer>
+                        </DataTemplate>
+                    </Views:RazorPadLayout.SyntaxTreeTemplate>
+                </Views:RazorPadLayout>
             </avalonDock:DockingManager.LayoutItemTemplateSelector>
             <avalonDock:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
@@ -89,96 +158,30 @@
 
 
 
-            <avalonDockLayout:LayoutRoot>
+            <avalonDockLayout:LayoutRoot x:Name="DefaultLayout">
                 <avalonDockLayout:LayoutRoot.RootPanel>
-
                     <avalonDockLayout:LayoutPanel Orientation="Vertical">
-
                         <avalonDockLayout:LayoutPanel Orientation="Horizontal">
-                            
-                            <avalonDockLayout:LayoutDocumentPane x:Name="DocumentPane" />
-
-                            <avalonDockLayout:LayoutAnchorablePane x:Name="ModelBuilderTab" DockMinWidth="150" DockWidth="300">
-                                <avalonDockLayout:LayoutAnchorable Title="Model Builder">
-                                    <Views:ModelBuilder DataContext="{Binding CurrentTemplate}" Background="Gainsboro" />
-                                </avalonDockLayout:LayoutAnchorable>
+                            <avalonDockLayout:LayoutDocumentPane />
+                            <avalonDockLayout:LayoutAnchorablePane DockMinWidth="150" DockWidth="300" x:Name="RightPane">
+                                <avalonDockLayout:LayoutAnchorable ContentId="ModelBuilder" Title="Model Builder" />
                             </avalonDockLayout:LayoutAnchorablePane>
-                            
                         </avalonDockLayout:LayoutPanel>
-
                         <avalonDockLayout:LayoutPanel Orientation="Horizontal" DockMinHeight="100" DockHeight="250">
-
                             <avalonDockLayout:LayoutPanel Orientation="Horizontal">
-
                                 <avalonDockLayout:LayoutAnchorablePane>
-
-                                    <avalonDockLayout:LayoutAnchorable x:Name="BrowserTab" Title="Browser View">
-                                        <WebBrowser DataContext="{Binding CurrentTemplate}"
-                                                    AttachedProperties:BrowseBehavior.Html="{Binding ExecutedTemplateOutput}" 
-                                        />
-                                    </avalonDockLayout:LayoutAnchorable>
-
-                                    <avalonDockLayout:LayoutAnchorable x:Name="OutputTab" Title="Source View">
-                                        <Editors:CodeEditor DataContext="{Binding CurrentTemplate}"
-                                                            Text="{Binding ExecutedTemplateOutput}" 
-                                                            ReadOnly="True" 
-                                                            EditorLanguage="XML" 
-                                                            EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
-                                        />
-                                    </avalonDockLayout:LayoutAnchorable>
-
-                                    <avalonDockLayout:LayoutAnchorable x:Name="CodeTab" Title="Generated Code">
-                                        <Editors:CodeEditor DataContext="{Binding CurrentTemplate}"
-                                                            Text="{Binding GeneratedTemplateCode}" 
-                                                            ReadOnly="True" 
-                                                            EditorLanguage="C#" 
-                                                            EditorFontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
-                                        />
-                                    </avalonDockLayout:LayoutAnchorable>
-
-                                    <avalonDockLayout:LayoutAnchorable x:Name="SyntaxTreeTab" Title="Syntax Tree">
-                                        <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                            <TextBox DataContext="{Binding CurrentTemplate}"
-                                                     Text="{Binding RazorSyntaxTree}" 
-                                                     IsReadOnly="True" 
-                                                     FontSize="{Binding RelativeSource={RelativeSource  FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
-                                            />
-                                        </ScrollViewer>
-                                    </avalonDockLayout:LayoutAnchorable>
+                                    <avalonDockLayout:LayoutAnchorable ContentId="BrowserView" Title="Browser View" />
+                                    <avalonDockLayout:LayoutAnchorable ContentId="SourceView" Title="Source View" />
+                                    <avalonDockLayout:LayoutAnchorable ContentId="GeneratedCode" Title="Generated Code" />
+                                    <avalonDockLayout:LayoutAnchorable ContentId="SyntaxTree" Title="Syntax Tree" />
                                 </avalonDockLayout:LayoutAnchorablePane>
-
                                 <avalonDockLayout:LayoutAnchorablePane>
-
-                                    <avalonDockLayout:LayoutAnchorable x:Name="ErrorsTab" Title="Errors" >
-                                        <DataGrid DataContext="{Binding CurrentTemplate}"
-                                                  ItemsSource="{Binding Errors}" 
-                                                  AllowDrop="False"
-                                                  CanUserAddRows="False"
-                                                  CanUserDeleteRows="False"
-                                                  IsManipulationEnabled="False"
-                                                  IsReadOnly="True"
-                                        />
-                                    </avalonDockLayout:LayoutAnchorable>
-
-                                    <avalonDockLayout:LayoutAnchorable x:Name="MessagesTab" Title="Messages" >
-                                        <ScrollViewer DataContext="{Binding CurrentTemplate}" 
-                                                      VerticalScrollBarVisibility="Auto"
-                                                      HorizontalScrollBarVisibility="Auto">
-                                            <TextBox x:Name="MessagesOutput" Text="{Binding MessageBuffer}" 
-                                                     DataContext="{Binding Messages}" 
-                                                     IsReadOnly="True" 
-                                                     FontSize="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
-                                            />
-                                        </ScrollViewer>
-                                    </avalonDockLayout:LayoutAnchorable>
-
+                                    <avalonDockLayout:LayoutAnchorable ContentId="Errors" Title="Errors" />
+                                    <avalonDockLayout:LayoutAnchorable ContentId="Messages" Title="Messages" />
                                 </avalonDockLayout:LayoutAnchorablePane>
-
                             </avalonDockLayout:LayoutPanel>
                         </avalonDockLayout:LayoutPanel>
-
                     </avalonDockLayout:LayoutPanel>
-
                 </avalonDockLayout:LayoutRoot.RootPanel>
             </avalonDockLayout:LayoutRoot>
         </avalonDock:DockingManager>
