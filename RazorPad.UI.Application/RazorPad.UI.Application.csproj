@@ -79,6 +79,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Views\ActiveDocumentConverter.cs" />
+    <Compile Include="Views\DocumentLocator.xaml.cs">
+      <DependentUpon>DocumentLocator.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ReferencesDialogWindow.xaml.cs">
       <DependentUpon>ReferencesDialogWindow.xaml</DependentUpon>
     </Compile>
@@ -94,6 +97,10 @@
     <Compile Include="Views\ModelBuilder.xaml.cs">
       <DependentUpon>ModelBuilder.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\DocumentLocator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ReferencesDialogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -163,6 +163,8 @@ namespace RazorPad.ViewModels
         }
         private ObservableCollection<Theme> _themes;
 
+        [Import(AllowDefault = true)]
+        public IRazorDocumentLocator Locator { get; set; }
 
 
         [ImportingConstructor]
@@ -206,7 +208,16 @@ namespace RazorPad.ViewModels
             NewCommand = new RelayCommand(() => AddNewTemplateEditor());
 
             OpenCommand = new RelayCommand(p => {
-                var filename = GetOpenFilenameThunk();
+                string filename;
+
+                if (Locator == null)
+                    filename = GetOpenFilenameThunk();
+                else
+                    filename = Locator.Locate();
+
+                if (string.IsNullOrWhiteSpace(filename))
+                    return;
+
                 AddNewTemplateEditor(filename);
             });
 

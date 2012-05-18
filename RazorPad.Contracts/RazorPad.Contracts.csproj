@@ -48,6 +48,7 @@
     <Compile Include="IModelBuilderFactory.cs" />
     <Compile Include="IModelProvider.cs" />
     <Compile Include="IModelProviderFactory.cs" />
+    <Compile Include="IRazorDocumentLocator.cs" />
     <Compile Include="IRazorDocumentSource.cs" />
     <Compile Include="ITemplateExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -38,7 +38,7 @@ namespace RazorPad.Persistence
 
         public bool CanSave(RazorDocument document, string uri)
         {
-            throw new NotImplementedException();
+            return _documentSources.Any(x => x.CanSave(document, uri));
         }
 
         public bool CanSave(RazorDocument document, Stream stream)
