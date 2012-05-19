@@ -21,9 +21,7 @@ namespace RazorPad.ViewModels
     [Export]
     public class MainWindowViewModel : ViewModelBase
     {
-        protected static readonly double DefaultFontSize = 
-            double.Parse(ConfigurationManager.AppSettings["FontSize"] ?? "12");
-
+        protected const double DefaultFontSize = 12;
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         private readonly RazorDocumentManager _documentManager;
@@ -149,6 +147,8 @@ namespace RazorPad.ViewModels
 
         public ObservableTextWriter Messages { get; set; }
 
+        public ObservableCollection<string> RecentFiles { get; set; }
+
         public ObservableCollection<Theme> Themes
         {
             get { return _themes; }
@@ -208,12 +208,15 @@ namespace RazorPad.ViewModels
             NewCommand = new RelayCommand(() => AddNewTemplateEditor());
 
             OpenCommand = new RelayCommand(p => {
-                string filename;
+                string filename = p as string;
 
-                if (Locator == null)
-                    filename = GetOpenFilenameThunk();
-                else
-                    filename = Locator.Locate();
+                if (string.IsNullOrWhiteSpace(filename))
+                {
+                    if (Locator == null)
+                        filename = GetOpenFilenameThunk();
+                    else
+                        filename = Locator.Locate();
+                }
 
                 if (string.IsNullOrWhiteSpace(filename))
                     return;
@@ -262,6 +265,7 @@ namespace RazorPad.ViewModels
             LoadThemeFromFileThunk(theme.FilePath);
             Themes.ToList().ForEach(x => x.Selected = false);
             theme.Selected = true;
+
             Preferences.Theme = theme.Name;
             
             Log.Info("Switched to {0} theme", theme.Name);
@@ -315,6 +319,9 @@ namespace RazorPad.ViewModels
             templateEditor.Messages = Messages;
 
             TemplateEditors.Add(templateEditor);
+
+            if (!string.IsNullOrWhiteSpace(templateEditor.Filename))
+                RecentFiles.Add(templateEditor.Filename);
 
             if (current)
             {
@@ -389,13 +396,15 @@ namespace RazorPad.ViewModels
                 Log.Info("Document saved to {0}", filename);
 
                 document.Filename = filename;
+
+                if(!string.IsNullOrWhiteSpace(filename))
+                    RecentFiles.Add(filename);
             }
             catch (Exception ex)
             {
                 Log.ErrorException("Error saving document", ex);
                 Error.SafeInvoke(ex.Message);
             }
-
 
             return filename;
         }

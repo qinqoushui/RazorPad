@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AvalonDock;
 using NLog;
 using NLog.Config;
 using RazorPad.Compilation.Hosts;
@@ -53,7 +54,11 @@ namespace RazorPad.Views
             ViewModel.GetReferencesThunk = GetReferences;
             ViewModel.Messages = observableWriter;
             ViewModel.Preferences = preferences;
-            ViewModel.Themes = new ObservableCollection<Theme>(themes);
+            ViewModel.RecentFiles = new ObservableCollection<string>(preferences.RecentFiles ?? Enumerable.Empty<string>());
+            ViewModel.Themes = new ObservableCollection<Theme>(themes ?? Enumerable.Empty<Theme>());
+
+            ViewModel.RecentFiles.CollectionChanged += (sender, args) =>
+                preferences.RecentFiles = ViewModel.RecentFiles.ToArray();
 
             var globalNamespaceImports = preferences.GlobalNamespaceImports ?? Enumerable.Empty<string>();
             foreach (var @namespace in globalNamespaceImports)
@@ -135,6 +140,14 @@ namespace RazorPad.Views
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             ServiceLocator.Get<IPreferencesService>().Save(Preferences.Current);
+        }
+
+        private void DocumentClosed(object sender, DocumentClosedEventArgs e)
+        {
+            var template = e.Document.Content as RazorTemplateEditorViewModel;
+
+            if (template != null)
+                ViewModel.TemplateEditors.Remove(template);
         }
     }
 }

@@ -40,6 +40,16 @@
                 <Separator/>
                 <MenuItem Header="_Save" Command="{Binding SaveCommand}" />
                 <MenuItem Header="Save _As..." Command="{Binding SaveAsCommand}" />
+                <Separator/>
+                <MenuItem Header="_Recent Files..." ItemsSource="{Binding RecentFiles}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Header" Value="{Binding}" />
+                            <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=DataContext.OpenCommand}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Execution">
                 <MenuItem Header="Automatic" IsCheckable="True" IsChecked="{Binding AutoExecute}" ToolTip="Automatically execute when template text changes" />
@@ -63,6 +73,7 @@
         <avalonDock:DockingManager x:Name="dockManager" Grid.Row="1"
                                    ActiveContent="{Binding CurrentTemplate, Mode=TwoWay, Converter={Views:ActiveDocumentConverter}}"
                                    DocumentsSource="{Binding TemplateEditors}"
+                                   DocumentClosed="DocumentClosed"
                                    Theme="{StaticResource VS2010Theme}">
 
             <avalonDock:DockingManager.LayoutItemTemplateSelector>
