@@ -13,6 +13,7 @@ using RazorPad.Framework;
 using RazorPad.Persistence;
 using RazorPad.UI;
 using RazorPad.UI.ModelBuilders;
+using RazorPad.UI.Settings;
 using RazorPad.UI.Theming;
 
 namespace RazorPad.ViewModels
@@ -99,27 +100,26 @@ namespace RazorPad.ViewModels
 
         public double FontSize
         {
-            get { return _fontSize; }
+            get { return Preferences.FontSize.GetValueOrDefault(DefaultFontSize); }
             set
             {
-                if (_fontSize == value)
+                if (Preferences.FontSize == value)
                     return;
 
-                _fontSize = value;
+                Preferences.FontSize = value;
                 OnPropertyChanged("FontSize");
             }
         }
-        private double _fontSize;
 
         public bool AutoExecute
         {
-            get { return _autoExecute; }
+            get { return Preferences.AutoExecute.GetValueOrDefault(true); }
             set
             {
-                if (_autoExecute == value)
+                if (Preferences.AutoExecute == value)
                     return;
 
-                _autoExecute = value;
+                Preferences.AutoExecute = value;
 
                 if (TemplateEditors != null)
                 {
@@ -132,7 +132,6 @@ namespace RazorPad.ViewModels
                 OnPropertyChanged("AutoExecute");
             }
         }
-        private bool _autoExecute;
 
         public string StatusMessage
         {
@@ -166,6 +165,9 @@ namespace RazorPad.ViewModels
         [Import(AllowDefault = true)]
         public IRazorDocumentLocator Locator { get; set; }
 
+        [Import]
+        public Preferences Preferences { get; set; }
+
 
         [ImportingConstructor]
         public MainWindowViewModel(RazorDocumentManager documentManager, ModelProviders modelProviders, ModelBuilders modelBuilders)
@@ -174,8 +176,6 @@ namespace RazorPad.ViewModels
             _modelBuilders = modelBuilders;
             _modelProviders = modelProviders;
 
-            AutoExecute = bool.Parse(ConfigurationManager.AppSettings["AutoExecute"] ?? "true");
-            FontSize = DefaultFontSize;
             TemplateEditors = new ObservableCollection<RazorTemplateEditorViewModel>();
 
             RegisterCommands();
@@ -262,6 +262,7 @@ namespace RazorPad.ViewModels
             LoadThemeFromFileThunk(theme.FilePath);
             Themes.ToList().ForEach(x => x.Selected = false);
             theme.Selected = true;
+            Preferences.Theme = theme.Name;
             
             Log.Info("Switched to {0} theme", theme.Name);
         }

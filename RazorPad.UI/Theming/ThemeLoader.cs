@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace RazorPad.UI.Theming
 {
-    [Export(typeof(ThemeLoader))]
+    [Export]
     public class ThemeLoader
     {
         public IEnumerable<Theme> LoadThemes(string selectedTheme = null)

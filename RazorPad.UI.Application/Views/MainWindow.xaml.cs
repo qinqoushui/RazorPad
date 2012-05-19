@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,6 +11,7 @@ using NLog.Config;
 using RazorPad.Compilation.Hosts;
 using RazorPad.Providers;
 using RazorPad.UI;
+using RazorPad.UI.Settings;
 using RazorPad.UI.Theming;
 using RazorPad.UI.Util;
 using RazorPad.ViewModels;
@@ -41,24 +43,30 @@ namespace RazorPad.Views
 
             ServiceLocator.Initialize("RazorPad", "RazorPad.UI", "RazorPad.Core");
 
-            RazorPadHost.AddGlobalImport("RazorPad");
-            RazorPadHost.AddGlobalImport("RazorPad.Compilation");
+
+            var preferences = Preferences.Current;
 
             var themeLoader = ServiceLocator.Get<ThemeLoader>();
-            var themes = themeLoader.LoadThemes();
+            var themes = themeLoader.LoadThemes(preferences.Theme);
 
             ViewModel = ServiceLocator.Get<MainWindowViewModel>();
             ViewModel.GetReferencesThunk = GetReferences;
             ViewModel.Messages = observableWriter;
+            ViewModel.Preferences = preferences;
             ViewModel.Themes = new ObservableCollection<Theme>(themes);
 
-            MouseWheel += HandleMouseWheel;
+            var globalNamespaceImports = preferences.GlobalNamespaceImports ?? Enumerable.Empty<string>();
+            foreach (var @namespace in globalNamespaceImports)
+            {
+                RazorPadHost.AddGlobalImport(@namespace);
+            }
+
+            ModelProviders.DefaultFactory =
+                ModelProviders.Current.GetProviderFactory(preferences.ModelProvider); ;
 
             CreateDemoTemplate();
 
             InitializeComponent();
-
-            MessagesOutput.TextChanged += ScrollToEnd;
 
             Log.Info("Done initializing");
         }
@@ -122,6 +130,11 @@ namespace RazorPad.Views
             }
 
             return references;
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            ServiceLocator.Get<IPreferencesService>().Save(Preferences.Current);
         }
     }
 }

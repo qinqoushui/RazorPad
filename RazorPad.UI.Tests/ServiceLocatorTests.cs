@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System.ComponentModel.Composition;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RazorPad.Persistence;
+using RazorPad.UI.Settings;
+using RazorPad.UI.Theming;
 using RazorPad.ViewModels;
 
 namespace RazorPad.UI
@@ -8,10 +11,16 @@ namespace RazorPad.UI
     [TestClass]
     public class ServiceLocatorTests
     {
+        [Export] public Preferences Preferences = Preferences.Default;
+
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            ServiceLocator.Initialize("RazorPad.UI", "RazorPad.Core");
+            ServiceLocator.Initialize(
+                "RazorPad.Core", 
+                "RazorPad.UI", 
+                "RazorPad.UI.Tests"
+            );
         }
 
         [TestMethod]
@@ -42,6 +51,20 @@ namespace RazorPad.UI
         {
             var viewModel = ServiceLocator.Get<MainWindowViewModel>();
             Assert.IsNotNull(viewModel);
+        }
+
+        [TestMethod]
+        public void ShouldLoadThemeLoader()
+        {
+            var loader = ServiceLocator.Get<ThemeLoader>();
+            Assert.IsNotNull(loader);
+        }
+
+        [TestMethod]
+        public void ShouldLoadPrefrencesService()
+        {
+            var service = ServiceLocator.Get<IPreferencesService>();
+            Assert.IsNotNull(service);
         }
     }
 }

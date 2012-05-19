@@ -7,6 +7,7 @@
         xmlns:AttachedProperties="clr-namespace:RazorPad.UI;assembly=RazorPad.UI" 
         xmlns:Editors="clr-namespace:RazorPad.UI.Editors;assembly=RazorPad.UI"
         xmlns:Views="clr-namespace:RazorPad.Views"
+        MouseWheel="HandleMouseWheel"
         Title="Razor Pad" Height="700" Width="1000">
     <Window.Resources>
         <avalonDockThemes:VS2010Theme x:Key="VS2010Theme"/>
@@ -168,6 +169,7 @@
                                                      DataContext="{Binding Messages}" 
                                                      IsReadOnly="True" 
                                                      FontSize="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.FontSize}" 
+                                                     TextChanged="ScrollToEnd"
                                             />
                                         </ScrollViewer>
                                     </avalonDockLayout:LayoutAnchorable>

@@ -48,6 +48,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -125,6 +126,8 @@
     <Compile Include="ModelBuilders\ModelBuilders.cs" />
     <Compile Include="ModelBuilders\ModelBuilderViewModel.cs" />
     <Compile Include="ServiceLocator.cs" />
+    <Compile Include="Settings\IPreferencesService.cs" />
+    <Compile Include="Settings\PreferencesService.cs" />
     <Compile Include="Theming\Theme.cs" />
     <Compile Include="Theming\ThemeLoader.cs" />
     <Compile Include="Util\BrowseBehavior.cs" />
@@ -134,6 +137,7 @@
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\MessageBoxHelpers.cs" />
     <Compile Include="ViewModels\NotifyPropertyChanged.cs" />
+    <Compile Include="Settings\Preferences.cs" />
     <Compile Include="ViewModels\RazorTemplateEditorViewModel.cs" />
     <Compile Include="ViewModels\AssemblyReference.cs" />
     <Compile Include="ViewModels\ReferencesViewModel.cs" />

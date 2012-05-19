@@ -15,7 +15,7 @@ namespace RazorPad
             get { return _current; }
             set { _current = value; }
         }
-        private static volatile ModelProviders _current = new ModelProviders();
+        private static volatile ModelProviders _current;
 
         public static IModelProviderFactory DefaultFactory
         {
@@ -58,6 +58,9 @@ namespace RazorPad
 
             foreach (var factory in providerFactories)
                 Add(factory);
+
+            if(Current == null)
+                Current = this;
         }
 
         public void Add(IModelProviderFactory factory)
@@ -81,18 +84,16 @@ namespace RazorPad
         {
             Log.Debug("Creating model provider for {0}...", provider);
 
-            IModelProviderFactory factory;
+            IModelProviderFactory factory = GetProviderFactory(provider);
 
-            var providerNickname = GetProviderDictionaryKey(provider);
-
-            if (_providers.TryGetValue(providerNickname, out factory) && factory != null)
+            if (factory != null)
             {
                 Log.Debug("Found registered model provider {0}", factory.GetType().Name);
             }
             else
             {
                 Log.Warn("Could not find {0} -- falling back to default model provider factory",
-                         providerNickname);
+                         provider);
 
                 factory = DefaultFactory;
             }
@@ -100,6 +101,17 @@ namespace RazorPad
             Log.Debug("Creating {0}...", factory.GetType().Name);
 
             return factory.Create();
+        }
+
+        public IModelProviderFactory GetProviderFactory(string provider)
+        {
+            IModelProviderFactory factory;
+
+            var providerNickname = GetProviderDictionaryKey(provider);
+
+            _providers.TryGetValue(providerNickname, out factory);
+            
+            return factory;
         }
 
         private static string GetProviderDictionaryKey(string typeName)
