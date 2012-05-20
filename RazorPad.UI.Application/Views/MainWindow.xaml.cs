@@ -54,11 +54,11 @@ namespace RazorPad.Views
             ViewModel.GetReferencesThunk = GetReferences;
             ViewModel.Messages = observableWriter;
             ViewModel.Preferences = preferences;
-            ViewModel.RecentFiles = new ObservableCollection<string>(preferences.RecentFiles ?? Enumerable.Empty<string>());
+            ViewModel.RecentFiles = new ObservableSet<string>(preferences.RecentFiles ?? Enumerable.Empty<string>());
             ViewModel.Themes = new ObservableCollection<Theme>(themes ?? Enumerable.Empty<Theme>());
 
             ViewModel.RecentFiles.CollectionChanged += (sender, args) =>
-                preferences.RecentFiles = ViewModel.RecentFiles.ToArray();
+                preferences.RecentFiles = ViewModel.RecentFiles.Distinct().ToArray();
 
             var globalNamespaceImports = preferences.GlobalNamespaceImports ?? Enumerable.Empty<string>();
             foreach (var @namespace in globalNamespaceImports)

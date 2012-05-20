@@ -132,6 +132,7 @@
     <Compile Include="Theming\ThemeLoader.cs" />
     <Compile Include="Util\BrowseBehavior.cs" />
     <Compile Include="Util\DelayedNotifyPropertyChangedTextBox.cs" />
+    <Compile Include="Util\ObservableSet.cs" />
     <Compile Include="Util\ObservableTextWriter.cs" />
     <Compile Include="Util\TextWriterTarget.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
