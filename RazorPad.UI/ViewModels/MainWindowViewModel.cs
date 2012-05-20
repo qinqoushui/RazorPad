@@ -302,6 +302,7 @@ namespace RazorPad.ViewModels
             }
 
             var document = _documentManager.Load(filename);
+            document.Filename = filename;
 
             AddNewTemplateEditor(document, current);
         }
