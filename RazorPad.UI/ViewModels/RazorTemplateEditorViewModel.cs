@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -45,20 +46,16 @@ namespace RazorPad.ViewModels
                 if (string.IsNullOrWhiteSpace(Filename))
                     return "New File";
 
-                return new FileInfo(Filename).Name;
-            }
-        }
+                try
+                {
+                    return new Uri(Filename).Segments.LastOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine("Couldn't figure out file display name: " + ex);
+                }
 
-        public string FileDirectory
-        {
-            get
-            {
-                string currentFilename = Filename;
-
-                if (string.IsNullOrWhiteSpace(currentFilename))
-                    return null;
-
-                return Path.GetDirectoryName(currentFilename);
+                return Filename;
             }
         }
 

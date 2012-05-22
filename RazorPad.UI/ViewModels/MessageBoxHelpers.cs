@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using Microsoft.Win32;
 
@@ -53,7 +54,10 @@ namespace RazorPad.ViewModels
             dlg.Filter = "VB Razor Documents|*.vbhtml";
             dlg.Filter = "All Files|*.*";
 
-            string directory = template.FileDirectory;
+            if (string.IsNullOrWhiteSpace(template.Filename))
+                return null;
+
+            string directory = Path.GetDirectoryName(template.Filename);
 
             if (!string.IsNullOrWhiteSpace(directory))
                 dlg.InitialDirectory = directory;
