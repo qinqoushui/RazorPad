@@ -19,7 +19,7 @@ namespace RazorPad.Views
 
         private static object RazorEditorOrDoNothing(object value)
         {
-            if (value is RazorTemplateEditorViewModel)
+            if (value is RazorTemplateViewModel)
                 return value;
 
             return Binding.DoNothing;

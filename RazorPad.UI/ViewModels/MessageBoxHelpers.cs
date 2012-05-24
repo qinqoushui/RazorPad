@@ -6,7 +6,7 @@ namespace RazorPad.ViewModels
 {
     internal static class MessageBoxHelpers
     {
-        internal static MessageBoxResult ShowConfirmSaveDirtyDocumentMessageBox(RazorTemplateEditorViewModel document)
+        internal static MessageBoxResult ShowConfirmSaveDirtyDocumentMessageBox(RazorTemplateViewModel document)
         {
             return
                 MessageBox.Show(
@@ -45,7 +45,7 @@ namespace RazorPad.ViewModels
             return null;
         }
 
-        internal static string ShowSaveAsDialog(RazorTemplateEditorViewModel template)
+        internal static string ShowSaveAsDialog(RazorTemplateViewModel template)
         {
             var dlg = new SaveFileDialog();
             dlg.DefaultExt = ".razorpad";

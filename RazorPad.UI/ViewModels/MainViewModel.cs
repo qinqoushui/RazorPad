@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -19,7 +18,7 @@ using RazorPad.UI.Theming;
 namespace RazorPad.ViewModels
 {
     [Export]
-    public class MainWindowViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase
     {
         protected const double DefaultFontSize = 12;
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
@@ -42,7 +41,7 @@ namespace RazorPad.ViewModels
         public ICommand SwitchThemeCommand { get; private set; }
 
         // Use thunks to create test seams
-        public Func<RazorTemplateEditorViewModel, MessageBoxResult> ConfirmSaveDirtyDocumentThunk =
+        public Func<RazorTemplateViewModel, MessageBoxResult> ConfirmSaveDirtyDocumentThunk =
             MessageBoxHelpers.ShowConfirmSaveDirtyDocumentMessageBox;
 
         public Func<string> GetOpenFilenameThunk =
@@ -51,7 +50,7 @@ namespace RazorPad.ViewModels
         public Func<IEnumerable<string>, IEnumerable<string>> GetReferencesThunk =
             references => references;
 
-        public Func<RazorTemplateEditorViewModel, string> GetSaveAsFilenameThunk =
+        public Func<RazorTemplateViewModel, string> GetSaveAsFilenameThunk =
             MessageBoxHelpers.ShowSaveAsDialog;
 
         public Action<string> ShowErrorThunk =
@@ -69,7 +68,7 @@ namespace RazorPad.ViewModels
                 };
 
 
-        public RazorTemplateEditorViewModel CurrentTemplate
+        public RazorTemplateViewModel CurrentTemplate
         {
             get { return _currentTemplate; }
             set
@@ -83,14 +82,14 @@ namespace RazorPad.ViewModels
                 OnPropertyChanged("HasCurrentTemplate");
             }
         }
-        private RazorTemplateEditorViewModel _currentTemplate;
+        private RazorTemplateViewModel _currentTemplate;
 
         public bool HasCurrentTemplate
         {
             get { return CurrentTemplate != null; }
         }
 
-        public ObservableCollection<RazorTemplateEditorViewModel> TemplateEditors
+        public ObservableCollection<RazorTemplateViewModel> Templates
         {
             get;
             private set;
@@ -119,9 +118,9 @@ namespace RazorPad.ViewModels
 
                 Preferences.AutoExecute = value;
 
-                if (TemplateEditors != null)
+                if (Templates != null)
                 {
-                    foreach (var editor in TemplateEditors)
+                    foreach (var editor in Templates)
                     {
                         editor.AutoExecute = value;
                     }
@@ -170,13 +169,13 @@ namespace RazorPad.ViewModels
 
 
         [ImportingConstructor]
-        public MainWindowViewModel(RazorDocumentManager documentManager, ModelProviders modelProviders, ModelBuilders modelBuilders)
+        public MainViewModel(RazorDocumentManager documentManager, ModelProviders modelProviders, ModelBuilders modelBuilders)
         {
             _documentManager = documentManager;
             _modelBuilders = modelBuilders;
             _modelProviders = modelProviders;
 
-            TemplateEditors = new ObservableCollection<RazorTemplateEditorViewModel>();
+            Templates = new ObservableCollection<RazorTemplateViewModel>();
 
             RegisterCommands();
         }
@@ -288,8 +287,8 @@ namespace RazorPad.ViewModels
                 return;
             }
 
-            RazorTemplateEditorViewModel loadedTemplate =
-                TemplateEditors
+            RazorTemplateViewModel loadedTemplate =
+                Templates
                     .Where(x => !string.IsNullOrWhiteSpace(x.Filename))
                     .SingleOrDefault(x => x.Filename.Equals(filename, StringComparison.OrdinalIgnoreCase));
 
@@ -309,34 +308,34 @@ namespace RazorPad.ViewModels
 
         public void AddNewTemplateEditor(RazorDocument document, bool current = true)
         {
-            AddNewTemplateEditor(new RazorTemplateEditorViewModel(document, _modelBuilders, _modelProviders), current);
+            AddNewTemplateEditor(new RazorTemplateViewModel(document, _modelBuilders, _modelProviders), current);
         }
 
-        public void AddNewTemplateEditor(RazorTemplateEditorViewModel templateEditor, bool current = true)
+        public void AddNewTemplateEditor(RazorTemplateViewModel template, bool current = true)
         {
             Log.Debug("Adding new template editor (current: {0})...", current);
 
-            templateEditor.AutoExecute = AutoExecute;
-            templateEditor.Messages = Messages;
+            template.AutoExecute = AutoExecute;
+            template.Messages = Messages;
 
-            TemplateEditors.Add(templateEditor);
+            Templates.Add(template);
 
-            if (!string.IsNullOrWhiteSpace(templateEditor.Filename))
-                RecentFiles.Add(templateEditor.Filename);
+            if (!string.IsNullOrWhiteSpace(template.Filename))
+                RecentFiles.Add(template.Filename);
 
             if (current)
             {
                 Log.Debug("Setting as current template");
-                CurrentTemplate = templateEditor;
+                CurrentTemplate = template;
             }
 
-            templateEditor.Execute();
+            template.Execute();
 
             Log.Info("Added new template editor");
         }
 
 
-        public void Close(RazorTemplateEditorViewModel document, bool? save = null)
+        public void Close(RazorTemplateViewModel document, bool? save = null)
         {
             Log.Debug("Closing document...");
 
@@ -359,12 +358,12 @@ namespace RazorPad.ViewModels
                 }
             }
 
-            TemplateEditors.Remove(document);
+            Templates.Remove(document);
 
             Log.Debug("Document closed");
         }
 
-        public void Save(RazorTemplateEditorViewModel document)
+        public void Save(RazorTemplateViewModel document)
         {
             var filename = document.Filename;
 
@@ -374,7 +373,7 @@ namespace RazorPad.ViewModels
             SaveAs(document, filename);
         }
 
-        public string SaveAs(RazorTemplateEditorViewModel document, string filename = null)
+        public string SaveAs(RazorTemplateViewModel document, string filename = null)
         {
             try
             {

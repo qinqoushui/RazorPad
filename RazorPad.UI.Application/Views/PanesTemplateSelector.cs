@@ -14,7 +14,7 @@ namespace RazorPad.Views
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is RazorTemplateEditorViewModel)
+            if (item is RazorTemplateViewModel)
                 return DocumentEditorTemplate;
 
             return base.SelectTemplate(item, container);

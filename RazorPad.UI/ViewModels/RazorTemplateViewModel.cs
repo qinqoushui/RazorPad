@@ -16,7 +16,7 @@ using RazorPad.UI.ModelBuilders;
 
 namespace RazorPad.ViewModels
 {
-    public class RazorTemplateEditorViewModel : ViewModelBase
+    public class RazorTemplateViewModel : ViewModelBase
     {
         private readonly ModelProviders _modelProviderFactory;
         private readonly ModelBuilders _modelBuilderFactory;
@@ -239,7 +239,7 @@ namespace RazorPad.ViewModels
         private bool _isDirty;
 
 
-        public RazorTemplateEditorViewModel(RazorDocument document = null, ModelBuilders modelBuilderFactory = null, ModelProviders modelProviders = null)
+        public RazorTemplateViewModel(RazorDocument document = null, ModelBuilders modelBuilderFactory = null, ModelProviders modelProviders = null)
         {
             _document = document ?? new RazorDocument();
             _modelBuilderFactory = modelBuilderFactory ?? ModelBuilders.Current;

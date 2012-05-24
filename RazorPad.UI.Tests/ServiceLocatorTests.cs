@@ -49,7 +49,7 @@ namespace RazorPad.UI
         [TestMethod]
         public void ShouldLoadMainWindowViewModel()
         {
-            var viewModel = ServiceLocator.Get<MainWindowViewModel>();
+            var viewModel = ServiceLocator.Get<MainViewModel>();
             Assert.IsNotNull(viewModel);
         }
 

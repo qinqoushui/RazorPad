@@ -23,9 +23,9 @@ namespace RazorPad.Views
     {
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-        protected MainWindowViewModel ViewModel
+        protected MainViewModel ViewModel
         {
-            get { return (MainWindowViewModel)DataContext; }
+            get { return (MainViewModel)DataContext; }
             private set { DataContext = value; }
         }
 
@@ -50,7 +50,7 @@ namespace RazorPad.Views
             var themeLoader = ServiceLocator.Get<ThemeLoader>();
             var themes = themeLoader.LoadThemes(preferences.Theme);
 
-            ViewModel = ServiceLocator.Get<MainWindowViewModel>();
+            ViewModel = ServiceLocator.Get<MainViewModel>();
             ViewModel.GetReferencesThunk = GetReferences;
             ViewModel.Messages = observableWriter;
             ViewModel.Preferences = preferences;
@@ -144,10 +144,10 @@ namespace RazorPad.Views
 
         private void DocumentClosed(object sender, DocumentClosedEventArgs e)
         {
-            var template = e.Document.Content as RazorTemplateEditorViewModel;
+            var template = e.Document.Content as RazorTemplateViewModel;
 
             if (template != null)
-                ViewModel.TemplateEditors.Remove(template);
+                ViewModel.Templates.Remove(template);
         }
     }
 }

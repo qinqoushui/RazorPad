@@ -72,7 +72,7 @@
 
         <avalonDock:DockingManager x:Name="dockManager" Grid.Row="1"
                                    ActiveContent="{Binding CurrentTemplate, Mode=TwoWay, Converter={Views:ActiveDocumentConverter}}"
-                                   DocumentsSource="{Binding TemplateEditors}"
+                                   DocumentsSource="{Binding Templates}"
                                    DocumentClosed="DocumentClosed"
                                    Theme="{StaticResource VS2010Theme}">
 
