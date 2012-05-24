@@ -408,5 +408,10 @@ namespace RazorPad.ViewModels
 
             return filename;
         }
+
+        public void SetRecentReferences(IEnumerable<string> references)
+        {
+            Preferences.RecentReferences = references;
+        }
     }
 }

@@ -15,12 +15,12 @@ namespace RazorPad.ViewModels
         public SearchableReferencesViewModel RecentReferences { get; set; }
         public SearchableReferencesViewModel InstalledReferences { get; set; }
 
-        public ReferencesViewModel(IEnumerable<AssemblyReference> loadedReferences)
+        public ReferencesViewModel(IEnumerable<AssemblyReference> loadedReferences, IEnumerable<string> recentReferenceLocations)
         {
             Log.Info(() => string.Format("Loaded references: {0}", string.Join(", ", loadedReferences)));
 
             var standardReferences = new StandardReferencesLocator().GetStandardReferences().ToArray();
-            var recentReferences = (Preferences.Current.RecentReferences ?? Enumerable.Empty<string>()).Where(File.Exists).Select(x => new AssemblyReference(x) { IsRecent = true }).ToArray();
+            var recentReferences = (recentReferenceLocations ?? Enumerable.Empty<string>()).Where(File.Exists).Select(x => new AssemblyReference(x) { IsRecent = true }).ToArray();
             var allReferences = loadedReferences.Union(standardReferences).Union(recentReferences).ToArray();
 
 
@@ -98,13 +98,6 @@ namespace RazorPad.ViewModels
                 var index = InstalledReferences.References.IndexOf(reference);
                 if (index >= 0) InstalledReferences.References.RemoveAt(index);
             }
-
-            Preferences.Current.RecentReferences =
-                RecentReferences.References
-                    .Distinct()
-                    .Take(50)
-                    .Select(r => r.Location);
-
 
             RecentReferences.References.ItemPropertyChanged += RecentReferences_ListChanged;
         }

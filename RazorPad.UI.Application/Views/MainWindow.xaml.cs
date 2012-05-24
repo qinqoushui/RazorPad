@@ -22,6 +22,8 @@ namespace RazorPad.Views
     {
         protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
+
+
         protected MainViewModel ViewModel
         {
             get { return (MainViewModel)DataContext; }
@@ -44,7 +46,8 @@ namespace RazorPad.Views
             ServiceLocator.Initialize("RazorPad", "RazorPad.UI", "RazorPad.Core");
 
 
-            var preferences = Preferences.Current;
+            var preferencesLoader = ServiceLocator.Get<IPreferencesService>();
+            var preferences = Preferences.Current = preferencesLoader.Load();
 
             var themeLoader = ServiceLocator.Get<ThemeLoader>();
             var themes = themeLoader.LoadThemes(preferences.Theme);
@@ -118,7 +121,7 @@ namespace RazorPad.Views
                     IsInstalled = true,
                 });
 
-            var dialogDataContext = new ReferencesViewModel(assemblyReferences);
+            var dialogDataContext = new ReferencesViewModel(assemblyReferences, ViewModel.Preferences.RecentReferences);
             var dlg = new ReferencesDialogWindow
             {
                 Owner = this,
@@ -131,6 +134,14 @@ namespace RazorPad.Views
             {
                 var selectedReferences = dialogDataContext.InstalledReferences.References;
                 references = selectedReferences.Select(reference => reference.Location).ToArray();
+
+                var recentReferences =
+                    dialogDataContext.RecentReferences.References
+                        .Distinct()
+                        .Take(50)
+                        .Select(r => r.Location);
+
+                ViewModel.SetRecentReferences(recentReferences);
             }
 
             return references;
@@ -138,7 +149,7 @@ namespace RazorPad.Views
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            ServiceLocator.Get<IPreferencesService>().Save(Preferences.Current);
+            ServiceLocator.Get<IPreferencesService>().Save(ViewModel.Preferences);
         }
 
         private void DocumentClosed(object sender, DocumentClosedEventArgs e)

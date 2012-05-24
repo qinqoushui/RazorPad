@@ -8,15 +8,7 @@ namespace RazorPad.UI.Settings
         [Export]
         public static Preferences Current
         {
-            get
-            {
-                if(_current == null)
-                {
-                    var service = ServiceLocator.Get<IPreferencesService>();
-                    _current = service.Load();
-                }
-                return _current;
-            }
+            get { return _current ?? Default; }
             set { _current = value; }
         }
         private volatile static Preferences _current;
