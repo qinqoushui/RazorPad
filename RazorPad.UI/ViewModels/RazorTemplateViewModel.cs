@@ -43,19 +43,25 @@ namespace RazorPad.ViewModels
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(Filename))
-                    return "New File";
+                string displayName = "New File";
 
-                try
+                if(Document.Metadata.ContainsKey("Title"))
                 {
-                    return new Uri(Filename).Segments.LastOrDefault();
+                    displayName = Document.Metadata["Title"];
                 }
-                catch (Exception ex)
+                else if (!string.IsNullOrWhiteSpace(Filename))
                 {
-                    Trace.WriteLine("Couldn't figure out file display name: " + ex);
+                    try
+                    {
+                        displayName = new Uri(Filename).Segments.LastOrDefault();
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine("Couldn't figure out file display name from URI: " + ex);
+                    }
                 }
 
-                return Filename;
+                return displayName;
             }
         }
 
