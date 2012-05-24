@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,7 +66,7 @@ namespace RazorPad.Views
             }
 
             ModelProviders.DefaultFactory =
-                ModelProviders.Current.GetProviderFactory(preferences.ModelProvider); ;
+                ModelProviders.Current.GetProviderFactory(preferences.ModelProvider);
 
             CreateDemoTemplate();
 
@@ -126,9 +125,9 @@ namespace RazorPad.Views
                 DataContext = dialogDataContext
             };
 
-            dlg.ShowDialog();
+            var referencesUpdated = dlg.ShowDialog();
 
-            if (dlg.DialogResult == true)
+            if (referencesUpdated == true)
             {
                 var selectedReferences = dialogDataContext.InstalledReferences.References;
                 references = selectedReferences.Select(reference => reference.Location).ToArray();

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using NLog;
+using RazorPad.UI.Settings;
 
 namespace RazorPad.ViewModels
 {
@@ -19,9 +19,9 @@ namespace RazorPad.ViewModels
         {
             Log.Info(() => string.Format("Loaded references: {0}", string.Join(", ", loadedReferences)));
 
-            var standardReferences = LoadStandardReferences().ToList();
-            var recentReferences = GetRecentReferences().ToList();
-            var allReferences = loadedReferences.Union(standardReferences).Union(recentReferences).ToList();
+            var standardReferences = new StandardReferencesLocator().GetStandardReferences().ToArray();
+            var recentReferences = (Preferences.Current.RecentReferences ?? Enumerable.Empty<string>()).Where(File.Exists).Select(x => new AssemblyReference(x) { IsRecent = true }).ToArray();
+            var allReferences = loadedReferences.Union(standardReferences).Union(recentReferences).ToArray();
 
 
             StandardReferences = new SearchableReferencesViewModel(standardReferences);
@@ -99,65 +99,29 @@ namespace RazorPad.ViewModels
                 if (index >= 0) InstalledReferences.References.RemoveAt(index);
             }
 
+            Preferences.Current.RecentReferences =
+                RecentReferences.References
+                    .Distinct()
+                    .Take(50)
+                    .Select(r => r.Location);
+
+
             RecentReferences.References.ItemPropertyChanged += RecentReferences_ListChanged;
         }
 
-
-
-        private static IEnumerable<AssemblyReference> LoadStandardReferences()
+        public bool TryAddReference(string filePath, out string message)
         {
-            var paths = (StandardDotNetReferencesLocator.GetStandardDotNetReferencePaths() ?? Enumerable.Empty<string>()).ToArray();
+            AssemblyReference assemblyReference;
+            AssemblyReference.TryLoadReference(filePath, out assemblyReference, out message);
 
-            Log.Debug("Standard .NET References: " + string.Join(", ", paths));
+            if (assemblyReference == null)
+                return false;
 
-            foreach (var path in paths)
-            {
-                AssemblyReference assemblyReference;
-                string message;
-
-                Log.Debug("Loading standard reference {0}... ", path);
-
-                var isLoadable = AssemblyReference.TryLoadReference(path, out assemblyReference, out message);
-
-                if (!isLoadable)
-                {
-                    Log.Warn("Reference {0} NOT loaded.", path);
-                    continue;
-                }
-
-                Log.Info("Standard reference {0} loaded.", path);
-
-                assemblyReference.IsStandard = true;
-
-                yield return assemblyReference;
-            }
-        }
-
-        private static IEnumerable<AssemblyReference> GetRecentReferences()
-        {
-            const string recentReferencesFilePath = "RecentReferences.txt";
-
-            Log.Info("Getting recent assembly references from " + recentReferencesFilePath);
-
-            if (File.Exists(recentReferencesFilePath))
-            {
-                try
-                {
-                    return File
-                            .ReadAllLines(recentReferencesFilePath)
-                            .Where(File.Exists)
-                            .Select(r => new AssemblyReference(r)
-                                            {
-                                                IsRecent = true
-                                            });
-                }
-                catch (Exception ex)
-                {
-                    Log.ErrorException("Error getting recent references: {0}", ex);
-                }
-            }
-
-            return Enumerable.Empty<AssemblyReference>();
+            assemblyReference.IsInstalled = assemblyReference.IsRecent = true;
+            RecentReferences.References.Add(assemblyReference);
+            InstalledReferences.References.Add(assemblyReference);
+                
+            return true;
         }
     }
 }

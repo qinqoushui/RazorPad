@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
+using NLog;
 
 namespace RazorPad.ViewModels
 {
-	public static class StandardDotNetReferencesLocator
+	public class StandardReferencesLocator
 	{
-		private static readonly IEnumerable<string> KnownRegistryLocations = new[] {
+        protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        
+        private static readonly IEnumerable<string> KnownRegistryLocations = new[] {
                 @"SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.5.50131\AssemblyFoldersEx\Visual Studio v11.0 Reference Assemblies",
                 @"SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\Visual Studio v11.0 Reference Assemblies",
                 @"SOFTWARE\Wow6432Node\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\Public Assemblies v11.0",
@@ -31,9 +34,33 @@ namespace RazorPad.ViewModels
             new Lazy<IEnumerable<string>>(DiscoverStandardDotNetReferencePaths);
 
 
-	    public static IEnumerable<string> GetStandardDotNetReferencePaths()
+        public IEnumerable<AssemblyReference> GetStandardReferences()
 	    {
-            return StandardDotNetReferencePaths.Value;
+            var paths = (StandardDotNetReferencePaths.Value ?? Enumerable.Empty<string>()).ToArray();
+
+            Log.Debug("Standard .NET References: " + string.Join(", ", paths));
+
+            foreach (var path in paths)
+            {
+                AssemblyReference assemblyReference;
+                string message;
+
+                Log.Debug("Loading standard reference {0}... ", path);
+
+                var isLoadable = AssemblyReference.TryLoadReference(path, out assemblyReference, out message);
+
+                if (!isLoadable)
+                {
+                    Log.Warn("Reference {0} NOT loaded.", path);
+                    continue;
+                }
+
+                Log.Info("Standard reference {0} loaded.", path);
+
+                assemblyReference.IsStandard = true;
+
+                yield return assemblyReference;
+            }
 	    }
 
 

@@ -57,7 +57,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AssemblyReference\StandardDotNetReferencesLocatorTests.cs" />
+    <Compile Include="AssemblyReference\StandardReferencesLocatorTests.cs" />
     <Compile Include="ModelBuilders\ModelBuilderFactoryTests.cs" />
     <Compile Include="ServiceLocatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
