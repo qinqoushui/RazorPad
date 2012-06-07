@@ -1,8 +1,9 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RazorPad.Core.Tests.Stubs;
 using RazorPad.Persistence;
 
-namespace RazorPad.Core.Tests
+namespace RazorPad.Core.Tests.Persistence
 {
     [TestClass]
     public class RazorDocumentLoaderTests
@@ -12,7 +13,7 @@ namespace RazorPad.Core.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _manager = new RazorDocumentManager(new[] { new XmlRazorDocumentSource() });
+            _manager = new RazorDocumentManager(new[] { new XmlRazorDocumentSource(new ModelProvidersStub()) });
         }
 
         [TestMethod]

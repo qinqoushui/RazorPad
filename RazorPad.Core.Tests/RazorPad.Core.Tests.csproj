@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="Persistence\RazorDocumentLoaderTests.cs" />
     <Compile Include="Persistence\XmlRazorDocumentSourceTests.cs" />
+    <Compile Include="Stubs\ModelProvidersStub.cs" />
     <None Include="AcceptanceTests\AcceptanceTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AcceptanceTests.cs</LastGenOutput>

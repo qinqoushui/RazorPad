@@ -14,7 +14,7 @@ namespace RazorPad.Core.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _loader = new RazorDocumentManager(new [] { new XmlRazorDocumentSource() });
+            _loader = new RazorDocumentManager(new XmlRazorDocumentSource(new RazorPad.Core.Tests.Stubs.ModelProvidersStub()));
             _templateCompiler = new TemplateCompiler();
         }
 
@@ -96,7 +96,8 @@ namespace RazorPad.Core.Tests
         private Stream GetResourceStream(string resourceName)
         {
             var type = GetType();
-            return type.Assembly.GetManifestResourceStream(type, resourceName);
+            var stream = type.Assembly.GetManifestResourceStream(type, resourceName);
+			return stream;
         }
     }
 }

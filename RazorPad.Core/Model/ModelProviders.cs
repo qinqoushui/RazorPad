@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using NLog;
@@ -47,20 +48,15 @@ namespace RazorPad
 
 
         [ImportingConstructor]
-        public ModelProviders([ImportMany]IEnumerable<IModelProviderFactory> factories = null)
+        public ModelProviders([ImportMany]params IModelProviderFactory[] factories)
         {
+            if (factories == null)
+                throw new ArgumentNullException("factories");
+
             _providers = new Dictionary<string, IModelProviderFactory>();
 
-            var providerFactories = factories ?? new IModelProviderFactory[] {
-                                        new BasicModelProvider.BasicModelProviderFactory(), 
-                                        new JsonModelProvider.JsonModelProviderFactory(),
-                                    };
-
-            foreach (var factory in providerFactories)
+            foreach (var factory in factories)
                 Add(factory);
-
-            if(Current == null)
-                Current = this;
         }
 
         public void Add(IModelProviderFactory factory)

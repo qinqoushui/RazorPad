@@ -1,10 +1,11 @@
 ﻿using System.IO;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RazorPad.Core.Tests.Stubs;
 using RazorPad.Persistence;
 using RazorPad.Providers;
 
-namespace RazorPad.Core.Tests
+namespace RazorPad.Core.Tests.Persistence
 {
     [TestClass]
     public class XmlRazorDocumentSourceTests
@@ -35,7 +36,7 @@ namespace RazorPad.Core.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            _documentSource = new XmlRazorDocumentSource();
+            _documentSource = new XmlRazorDocumentSource(new ModelProvidersStub());
         }
 
         [TestMethod]

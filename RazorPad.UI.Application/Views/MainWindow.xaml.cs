@@ -49,6 +49,9 @@ namespace RazorPad.Views
             var preferencesLoader = ServiceLocator.Get<IPreferencesService>();
             var preferences = Preferences.Current = preferencesLoader.Load();
 
+            var modelProviders = ServiceLocator.Get<ModelProviders>();
+            ModelProviders.DefaultFactory = modelProviders.GetProviderFactory(preferences.ModelProvider);
+
             var themeLoader = ServiceLocator.Get<ThemeLoader>();
             var themes = themeLoader.LoadThemes(preferences.Theme);
 
@@ -67,9 +70,6 @@ namespace RazorPad.Views
             {
                 RazorPadHost.AddGlobalImport(@namespace);
             }
-
-            ModelProviders.DefaultFactory =
-                ModelProviders.Current.GetProviderFactory(preferences.ModelProvider);
 
             CreateDemoTemplate();
 

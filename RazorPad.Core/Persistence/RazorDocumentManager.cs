@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,7 +15,7 @@ namespace RazorPad.Persistence
         public Encoding Encoding { get; set; }
 
         [ImportingConstructor]
-        public RazorDocumentManager([ImportMany]IEnumerable<IRazorDocumentSource> documentSources)
+        public RazorDocumentManager([ImportMany]params IRazorDocumentSource[] documentSources)
         {
             _documentSources = (documentSources ?? Enumerable.Empty<IRazorDocumentSource>());
 

@@ -248,8 +248,8 @@ namespace RazorPad.ViewModels
         public RazorTemplateViewModel(RazorDocument document = null, ModelBuilders modelBuilderFactory = null, ModelProviders modelProviders = null)
         {
             _document = document ?? new RazorDocument();
-            _modelBuilderFactory = modelBuilderFactory ?? ModelBuilders.Current;
-            _modelProviderFactory = modelProviders ?? ModelProviders.Current;
+            _modelBuilderFactory = modelBuilderFactory;
+            _modelProviderFactory = modelProviders;
             _savedModels = new Dictionary<Type, string>();
 
             var modelProviderNames = _modelProviderFactory.Providers.Select(x => (string)new ModelProviderFactoryName(x.Value));

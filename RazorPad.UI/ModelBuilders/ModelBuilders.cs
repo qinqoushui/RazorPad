@@ -8,14 +8,6 @@ namespace RazorPad.UI.ModelBuilders
     [Export]
     public class ModelBuilders
     {
-        public static ModelBuilders Current
-        {
-            get { return _current; }
-            set { _current = value; }
-        }
-        private static volatile ModelBuilders _current = new ModelBuilders();
-
-
         public IList<IModelBuilderFactory> Builders
         {
             get { return _modelBuilders; }

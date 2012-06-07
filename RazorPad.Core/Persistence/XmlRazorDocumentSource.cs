@@ -16,7 +16,7 @@ namespace RazorPad.Persistence
         private static readonly IList<string> Extensions =
             new List<string> { ".razorpad", ".xml" };
 
-        private readonly ModelProviders _modelProviderFactory;
+        private readonly ModelProviders _modelProviders;
 
         public Encoding Encoding { get; set; }
 
@@ -58,9 +58,12 @@ namespace RazorPad.Persistence
         }
 
         [ImportingConstructor]
-        public XmlRazorDocumentSource(ModelProviders modelProviderFactory = null)
+        public XmlRazorDocumentSource(ModelProviders modelProviders)
         {
-            _modelProviderFactory = modelProviderFactory ?? ModelProviders.Current;
+            if(modelProviders == null)
+                throw new ArgumentNullException("modelProviders");
+
+            _modelProviders = modelProviders;
             Encoding = Encoding.UTF8;
         }
 
@@ -117,7 +120,7 @@ namespace RazorPad.Persistence
 
             var modelProviderEl = modelEl.Attribute("Provider");
             var modelProviderName = (modelProviderEl == null) ? "Json" : modelProviderEl.Value;
-            var modelProvider = _modelProviderFactory.Create(modelProviderName);
+            var modelProvider = _modelProviders.Create(modelProviderName);
             modelProvider.Deserialize(modelEl.Value);
             var references = referencesEl.Elements().Select(x => x.Value).Where(x => !string.IsNullOrWhiteSpace(x));
 
