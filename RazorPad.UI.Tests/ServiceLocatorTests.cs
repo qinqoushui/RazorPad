@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Composition;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RazorPad.Persistence;
 using RazorPad.UI.Settings;
@@ -11,11 +10,11 @@ namespace RazorPad.UI
     [TestClass]
     public class ServiceLocatorTests
     {
-        [Export] public Preferences Preferences = Preferences.Default;
-
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
+            Preferences.Current = Preferences.Default;
+
             ServiceLocator.Initialize(
                 "RazorPad.Core", 
                 "RazorPad.UI", 

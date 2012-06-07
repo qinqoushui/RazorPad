@@ -16,7 +16,7 @@ namespace RazorPad.UI.ModelBuilders
 
 
         [ImportingConstructor]
-        public ModelBuilders([ImportMany]IEnumerable<IModelBuilderFactory> modelBuilders = null)
+        public ModelBuilders([ImportMany]params IModelBuilderFactory[] modelBuilders)
         {
             _modelBuilders = new List<IModelBuilderFactory>(modelBuilders ?? new [] {new JsonModelBuilderFactory() });
         }
