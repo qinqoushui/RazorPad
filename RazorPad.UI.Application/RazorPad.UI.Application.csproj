@@ -19,7 +19,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\RazorPad\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>..\..\download.razorpad.net\clickonce\</PublishUrl>
+    <PublishUrl>..\..\download.razorpad.net\install\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -29,11 +29,13 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>http://download.razorpad.net/clickonce/</InstallUrl>
-    <ProductName>RazorPad UI</ProductName>
+    <InstallUrl>http://download.razorpad.net/install/</InstallUrl>
+    <ProductName>RazorPad</ProductName>
     <PublisherName>RazorPad Developers</PublisherName>
     <SuiteName>RazorPad</SuiteName>
-    <ApplicationRevision>0</ApplicationRevision>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.html</WebPage>
+    <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
