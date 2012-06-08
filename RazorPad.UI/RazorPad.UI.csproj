@@ -125,6 +125,7 @@
     <Compile Include="ModelBuilders\ModelBuilderFactory.cs" />
     <Compile Include="ModelBuilders\ModelBuilders.cs" />
     <Compile Include="ModelBuilders\ModelBuilderViewModel.cs" />
+    <Compile Include="Persistence\AutoSaver.cs" />
     <Compile Include="ServiceLocator.cs" />
     <Compile Include="Settings\IPreferencesService.cs" />
     <Compile Include="Settings\PreferencesService.cs" />

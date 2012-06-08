@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Markup;
@@ -12,6 +13,7 @@ using RazorPad.Framework;
 using RazorPad.Persistence;
 using RazorPad.UI;
 using RazorPad.UI.ModelBuilders;
+using RazorPad.UI.Persistence;
 using RazorPad.UI.Settings;
 using RazorPad.UI.Theming;
 
@@ -58,14 +60,14 @@ namespace RazorPad.ViewModels
 
         public Action<string> LoadThemeFromFileThunk =
             filename =>
+            {
+                using (var stream = File.OpenRead(filename))
                 {
-                    using (var stream = File.OpenRead(filename))
-                    {
-                        var dic = (ResourceDictionary) XamlReader.Load(stream);
-                        Application.Current.Resources.MergedDictionaries.Clear();
-                        Application.Current.Resources.MergedDictionaries.Add(dic);
-                    }
-                };
+                    var dic = (ResourceDictionary)XamlReader.Load(stream);
+                    Application.Current.Resources.MergedDictionaries.Clear();
+                    Application.Current.Resources.MergedDictionaries.Add(dic);
+                }
+            };
 
 
         public RazorTemplateViewModel CurrentTemplate
@@ -130,6 +132,28 @@ namespace RazorPad.ViewModels
             }
         }
 
+        public bool AutoSave
+        {
+            get { return Preferences.AutoSave.GetValueOrDefault(true); }
+            set
+            {
+                if (Preferences.AutoSave == value)
+                    return;
+
+                Preferences.AutoSave = value;
+
+                if (Templates != null)
+                {
+                    foreach (var editor in Templates)
+                    {
+                        editor.AutoSave = value;
+                    }
+                }
+
+                OnPropertyChanged("AutoSave");
+            }
+        }
+
         public string StatusMessage
         {
             get { return _statusMessage; }
@@ -163,6 +187,9 @@ namespace RazorPad.ViewModels
 
         [Import(AllowDefault = true)]
         public IRazorDocumentLocator Locator { get; set; }
+
+        [Import(AllowDefault = true)]
+        public AutoSaver AutoSaver { get; set; }
 
         [Import]
         public Preferences Preferences { get; set; }
@@ -199,14 +226,16 @@ namespace RazorPad.ViewModels
 
             FontSizeCommand = new RelayCommand(ChangeFontSize);
 
-            ManageReferencesCommand = new RelayCommand(() => {
+            ManageReferencesCommand = new RelayCommand(() =>
+            {
                 var loadedReferences = CurrentTemplate.AssemblyReferences;
                 CurrentTemplate.AssemblyReferences = GetReferencesThunk(loadedReferences);
             });
 
             NewCommand = new RelayCommand(() => AddNewTemplateEditor());
 
-            OpenCommand = new RelayCommand(p => {
+            OpenCommand = new RelayCommand(p =>
+            {
                 string filename = p as string;
 
                 if (string.IsNullOrWhiteSpace(filename))
@@ -266,7 +295,7 @@ namespace RazorPad.ViewModels
             theme.Selected = true;
 
             Preferences.Theme = theme.Name;
-            
+
             Log.Info("Switched to {0} theme", theme.Name);
         }
 
@@ -316,7 +345,10 @@ namespace RazorPad.ViewModels
             Log.Debug("Adding new template editor (current: {0})...", current);
 
             template.AutoExecute = AutoExecute;
+            template.AutoSave = AutoExecute;
             template.Messages = Messages;
+
+            template.Executing += OnAutoSave;
 
             Templates.Add(template);
 
@@ -333,7 +365,6 @@ namespace RazorPad.ViewModels
 
             Log.Info("Added new template editor");
         }
-
 
         public void Close(RazorTemplateViewModel document, bool? save = null)
         {
@@ -361,6 +392,21 @@ namespace RazorPad.ViewModels
             Templates.Remove(document);
 
             Log.Debug("Document closed");
+        }
+
+        public void LoadAutoSave()
+        {
+            try
+            {
+                var template = AutoSaver.Load();
+                
+                if(template != null)
+                    AddNewTemplateEditor(template);
+            }
+            catch (Exception ex)
+            {
+                Log.WarnException("Auto-save file found, but there was an error loading it.", ex);
+            }
         }
 
         public void Save(RazorTemplateViewModel document)
@@ -397,8 +443,11 @@ namespace RazorPad.ViewModels
 
                 document.Filename = filename;
 
-                if(!string.IsNullOrWhiteSpace(filename))
+                if (!string.IsNullOrWhiteSpace(filename))
                     RecentFiles.Add(filename);
+
+                if(AutoSaver != null)
+                    AutoSaver.Clear();
             }
             catch (Exception ex)
             {
@@ -412,6 +461,29 @@ namespace RazorPad.ViewModels
         public void SetRecentReferences(IEnumerable<string> references)
         {
             Preferences.RecentReferences = references;
+        }
+
+        private void OnAutoSave(object sender, EventArgs e)
+        {
+            if(AutoSaver == null)
+                return;
+
+            var template = sender as RazorTemplateViewModel ?? CurrentTemplate;
+
+            if (template == null)
+                return;
+
+            new TaskFactory().StartNew(() => {
+                try
+                {
+                    AutoSaver.Save(template.Document);
+                    Log.Info("Auto-Saved the document for you -- you can thank me later.");
+                }
+                catch (Exception ex)
+                {
+                    Log.WarnException("Auto-save failed", ex);
+                }
+            });
         }
     }
 }

@@ -65,13 +65,17 @@ namespace RazorPad.Views
             ViewModel.RecentFiles.CollectionChanged += (sender, args) =>
                 preferences.RecentFiles = ViewModel.RecentFiles.Distinct().ToArray();
 
+            ViewModel.LoadAutoSave();
+
             var globalNamespaceImports = preferences.GlobalNamespaceImports ?? Enumerable.Empty<string>();
             foreach (var @namespace in globalNamespaceImports)
             {
                 RazorPadHost.AddGlobalImport(@namespace);
             }
 
-            CreateDemoTemplate();
+            // Add a demo template if it's enabled there aren't any templates loaded
+            if (preferences.ShowDemoTemplate.GetValueOrDefault(true) && !ViewModel.Templates.Any())
+                CreateDemoTemplate();
 
             InitializeComponent();
 

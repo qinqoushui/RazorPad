@@ -54,13 +54,13 @@ namespace RazorPad.ViewModels
             dlg.Filter = "VB Razor Documents|*.vbhtml";
             dlg.Filter = "All Files|*.*";
 
-            if (string.IsNullOrWhiteSpace(template.Filename))
-                return null;
+            if (!string.IsNullOrWhiteSpace(template.Filename))
+            {
+                string directory = Path.GetDirectoryName(template.Filename);
 
-            string directory = Path.GetDirectoryName(template.Filename);
-
-            if (!string.IsNullOrWhiteSpace(directory))
-                dlg.InitialDirectory = directory;
+                if (!string.IsNullOrWhiteSpace(directory))
+                    dlg.InitialDirectory = directory;
+            }
 
             if (dlg.ShowDialog().GetValueOrDefault())
                 return dlg.FileName;

@@ -23,6 +23,13 @@ namespace RazorPad.ViewModels
         private readonly RazorDocument _document;
         private readonly IDictionary<Type, string> _savedModels;
 
+        public event EventHandler Executing
+        {
+            add { _executing += value; }
+            remove { _executing -= value; }
+        }
+        private event EventHandler _executing;
+
         public ITemplateCompiler TemplateCompiler { get; set; }
 
         public bool AutoExecute
@@ -38,6 +45,20 @@ namespace RazorPad.ViewModels
             }
         }
         private bool _autoExecute;
+
+        public bool AutoSave
+        {
+            get { return _autoSave; }
+            set
+            {
+                if (_autoSave == value)
+                    return;
+
+                _autoSave = value;
+                OnPropertyChanged("AutoSave");
+            }
+        }
+        private bool _autoSave;
 
         public string DisplayName
         {
@@ -292,6 +313,8 @@ namespace RazorPad.ViewModels
 
         public void Execute()
         {
+            _executing.SafeInvoke(sender: this);
+
             new TaskFactory().StartNew(() =>
             {
                 try

@@ -40,6 +40,7 @@
                 <Separator/>
                 <MenuItem Header="_Save" Command="{Binding SaveCommand}" />
                 <MenuItem Header="Save _As..." Command="{Binding SaveAsCommand}" />
+                <MenuItem Header="Auto-Save" IsCheckable="True" IsChecked="{Binding AutoSave}" ToolTip="Automatically save the document before execution" />
                 <Separator/>
                 <MenuItem Header="_Recent Files..." ItemsSource="{Binding RecentFiles}">
                     <MenuItem.ItemContainerStyle>
