@@ -9,18 +9,19 @@ namespace RazorPad.UI.Editors.Folding
 {
 	public class TextEditorWithParseInformationFolding : ITextEditorWithParseInformationFolding
 	{
-		ITextEditor textEditor;
+		public ITextEditor TextEditor { get; set; }
+	
 		FoldingManager foldingManager;
 		
 		public TextEditorWithParseInformationFolding(ITextEditor textEditor)
 		{
-			this.textEditor = textEditor;
+			this.TextEditor = textEditor;
 		    IsParseInformationFoldingEnabled = true;
 		}
 		
 		public void InstallFoldingManager()
 		{
-			var textEditorAdapter = textEditor as AvalonEditTextEditorAdapter;
+			var textEditorAdapter = TextEditor as AvalonEditTextEditorAdapter;
 			if (textEditorAdapter != null) {
 				foldingManager = FoldingManager.Install(textEditorAdapter.TextEditor.TextArea);
 			}
@@ -37,7 +38,7 @@ namespace RazorPad.UI.Editors.Folding
 		
 		public string GetTextSnapshot()
 		{
-			return textEditor.Document.CreateSnapshot().Text;
+			return TextEditor.Document.CreateSnapshot().Text;
 		}
 		
 		public void Dispose()

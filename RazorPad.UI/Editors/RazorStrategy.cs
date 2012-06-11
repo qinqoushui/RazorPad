@@ -16,7 +16,6 @@ namespace RazorPad.UI.Editors
         public void Apply(CodeEditor editor)
         {
             editor.Editor.TextArea.IndentationStrategy = new DefaultIndentationStrategy();
-            //editor.InitializeFolding(new XmlFoldingStrategy());
             editor.Editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("CSharpRazor") ?? LoadCSharpRazorDefinition();
 
             var cSharpRazorLanguageBinding = new CSharpRazorLanguageBinding(new TextEditorWithParseInformationFoldingFactory(),

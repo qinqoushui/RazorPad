@@ -16,5 +16,7 @@ namespace RazorPad.UI.Editors.Folding
         void UpdateFolds(IEnumerable<NewFolding> folds);
         void InstallFoldingManager();
         string GetTextSnapshot();
+
+		ITextEditor TextEditor { get; set; }
     }
 }
