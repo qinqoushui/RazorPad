@@ -71,6 +71,7 @@
     <Compile Include="Editors\CodeCompletion\CodeCompletionWindow.cs" />
     <Compile Include="Editors\CodeCompletion\StringToVisibilityConverter.cs" />
     <Compile Include="Editors\CodeEditor.cs" />
+    <Compile Include="Editors\Folding\RazorElementFold.cs" />
     <Compile Include="Editors\Folding\ReactiveFoldGenerator.cs" />
     <Compile Include="Editors\Folding\CSharpRazorLanguageBinding.cs" />
     <Compile Include="Editors\CSharpStrategy.cs" />

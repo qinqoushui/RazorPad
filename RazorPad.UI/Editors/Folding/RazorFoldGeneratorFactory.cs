@@ -14,9 +14,6 @@ namespace RazorPad.UI.Editors.Folding
 		
 		public IFoldGenerator CreateFoldGenerator(ITextEditorWithParseInformationFolding textEditor)
 		{
-			//return new ScheduledFoldGenerator(
-			//	new FoldGenerator(textEditor, new RazorHtmlFoldParser(FileExtension)));
-
 			return new ReactiveFoldGenerator(textEditor.TextEditor,
 				new FoldGenerator(textEditor,
 								  new RazorHtmlFoldParser(FileExtension)));
