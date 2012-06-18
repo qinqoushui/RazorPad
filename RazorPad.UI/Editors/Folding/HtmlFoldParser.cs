@@ -1,7 +1,6 @@
 // Copyright (c) AlphaSierraPapa for the SharpDevelop Team (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -60,7 +59,7 @@ namespace RazorPad.UI.Editors.Folding
         {
             SaveRazorFoldsStartOnStack(razorHtmlReader.CodeSpans);
         }
-        
+
         void ClearPreviousFolds()
         {
             folds.Clear();
@@ -68,7 +67,7 @@ namespace RazorPad.UI.Editors.Folding
 
         RazorHtmlReader CreateHtmlReader(string html)
         {
-           return htmlReaderFactory.CreateHtmlReader(html);
+            return htmlReaderFactory.CreateHtmlReader(html);
         }
 
         void SaveFoldStartOnStack()
@@ -86,16 +85,29 @@ namespace RazorPad.UI.Editors.Folding
         {
             foreach (var syntaxTreeNode in nodes)
             {
-                folds.Add(new RazorElementFold
+                if (IsMultiLineBlock(syntaxTreeNode))
                 {
-                    ElementName = RazorCodeSpanParser.GetBlockName(syntaxTreeNode as Block),
-                    StartOffset = syntaxTreeNode.Start.AbsoluteIndex,
-                    Line = syntaxTreeNode.Start.LineIndex,
-                    EndOffset = syntaxTreeNode.Start.AbsoluteIndex + syntaxTreeNode.Length
-                });
+                    folds.Add(new RazorElementFold
+                                  {
+                                      ElementName = RazorCodeSpanParser.GetBlockName(syntaxTreeNode as Block),
+                                      StartOffset = syntaxTreeNode.Start.AbsoluteIndex,
+                                      Line = syntaxTreeNode.Start.LineIndex,
+                                      EndOffset = syntaxTreeNode.Start.AbsoluteIndex + syntaxTreeNode.Length
+                                  });
+                }
             }
         }
-        
+
+        private bool IsMultiLineBlock(SyntaxTreeNode node)
+        {
+            var block = node as Block;
+
+            // will be true for markup spans as well, but they are handled elsewhere
+            if (!node.IsBlock || block == null || !block.Children.Any()) return false;
+
+            return block.Children.First().Start.LineIndex != block.Children.Last().Start.LineIndex;
+        }
+
         void AddFoldForCompletedElement()
         {
             if (foldStack.Any())
@@ -124,67 +136,6 @@ namespace RazorPad.UI.Editors.Folding
         void SortFoldsByStartOffset()
         {
             folds.Sort((fold1, fold2) => fold1.StartOffset.CompareTo(fold2.StartOffset));
-        }
-    }
-
-    public class RazorCodeSpanParser
-    {
-        public static string GetBlockName(Block block)
-        {
-            const string defaultName = "...";
-            switch (block.Type)
-            {
-                case BlockType.Statement:
-                    return "@{...}";
-                case BlockType.Directive:
-                    break;
-                case BlockType.Functions:
-                    return "@funtions";
-                case BlockType.Expression:
-                    break;
-                case BlockType.Helper:
-                    return GetHelperBlockName(block);
-                case BlockType.Markup:
-                    break;
-                case BlockType.Section:
-                    return GetSectionBlockName(block);
-                case BlockType.Template:
-                    break;
-                case BlockType.Comment:
-                    return GetCommentBlockName(block);
-                default:
-                    return defaultName;
-            }
-            return defaultName;
-        }
-
-        private static string GetCommentBlockName(Block block)
-        {
-            return "/* ... */";
-        }
-
-        private static string GetSectionBlockName(Block block)
-        {
-            var sectionName = "";
-            if (block.Children != null)
-            {
-                var sectionHeader =
-                    block.Children.FirstOrDefault(c => c.GetType() == typeof (SectionHeaderSpan)) as SectionHeaderSpan;
-                sectionName = sectionHeader != null ? sectionHeader.SectionName : "";
-            }
-            return string.Format("@section {0}", sectionName);
-        }
-
-        private static string GetHelperBlockName(Block block)
-        {
-            var headerName = "";
-            var helperHeader = block.Children.FirstOrDefault(c => c.GetType() == typeof (HelperHeaderSpan)) as HelperHeaderSpan;
-            if (helperHeader != null)
-            {
-                headerName =
-                    helperHeader.Content.Substring(0, helperHeader.Content.IndexOf("(", StringComparison.Ordinal)).Trim();
-            }
-            return string.Format("@helper {0}", headerName);
         }
     }
 }
