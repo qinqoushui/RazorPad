@@ -1,5 +1,5 @@
-// Copyright (c) AlphaSierraPapa for the SharpDevelop Team (for details please see \doc\copyright.txt)
-// This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+using System.Collections.Generic;
+using System.Web.Razor.Parser.SyntaxTree;
 
 namespace RazorPad.UI.Editors.Folding
 {
@@ -21,6 +21,11 @@ namespace RazorPad.UI.Editors.Folding
         protected override bool IsHtml()
         {
             return reader.IsHtml;
+        }
+
+        public IEnumerable<SyntaxTreeNode> CodeSpans
+        {
+            get { return reader.CodeSpans; }
         }
     }
 }

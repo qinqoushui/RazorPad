@@ -87,7 +87,7 @@
     <Compile Include="Editors\Folding\IFoldGenerator.cs" />
     <Compile Include="Editors\Folding\IFoldGeneratorFactory.cs" />
     <Compile Include="Editors\Folding\IFoldParser.cs" />
-    <Compile Include="Editors\Folding\IHtmlReaderFactory.cs" />
+    <Compile Include="Editors\Folding\IRazorHtmlReaderFactory.cs" />
     <Compile Include="Editors\Folding\ITextEditor.cs" />
     <Compile Include="Editors\Folding\ITextEditorWithParseInformationFolding.cs" />
     <Compile Include="Editors\Folding\FoldGenerator.cs" />

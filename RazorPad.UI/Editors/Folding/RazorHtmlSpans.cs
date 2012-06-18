@@ -1,37 +1,44 @@
-// Copyright (c) AlphaSierraPapa for the SharpDevelop Team (for details please see \doc\copyright.txt)
-// This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Razor;
+using System.Web.Razor.Parser;
 using System.Web.Razor.Parser.SyntaxTree;
 
 namespace RazorPad.UI.Editors.Folding
 {
-    public class RazorHtmlSpans
+    public class RazorFoldableSpans
     {
-        List<Span> spans;
+        IEnumerable<Span> htmlSpans;
         RazorCodeLanguage codeLanguage;
+        private ParserResults parserResults;
 
-        public RazorHtmlSpans(string html, string fileExtension)
+        public IEnumerable<SyntaxTreeNode> CodeSpans { get; private set; }
+
+
+        public RazorFoldableSpans(string markup, string fileExtension)
         {
             codeLanguage = RazorCodeLanguage.GetLanguageByExtension(fileExtension);
-            ReadHtmlSpans(html);
+            ReadHtmlSpans(markup);
+            ReadCodeSpans(markup);
         }
 
-        public string CodeLanguageName
+        private void ReadCodeSpans(string markup)
         {
-            get { return codeLanguage.LanguageName; }
+            if (!IsTemplateParsed()) ParseTemplate(markup);
+            CodeSpans = parserResults.Document.Children.Where(span => span.IsBlock);
         }
 
         void ReadHtmlSpans(string html)
         {
-            var razorEngineHost = new RazorEngineHost(codeLanguage);
-            var engine = new RazorTemplateEngine(razorEngineHost);
-            var results = engine.ParseTemplate(new StringReader(html));
-            spans = new List<Span>(results.Document.Flatten());
-            spans.RemoveAll(span => span.Kind != SpanKind.Markup);
+            if(!IsTemplateParsed()) ParseTemplate(html);
+            htmlSpans = parserResults.Document.Flatten().Where(span => span.Kind == SpanKind.Markup);
+        }
+
+        void ParseTemplate(string html)
+        {
+            var parser = new RazorParser(codeLanguage.CreateCodeParser(), new HtmlMarkupParser());
+            parserResults = parser.Parse(new StringReader(html));
         }
 
         public bool IsHtml(int offset)
@@ -41,13 +48,19 @@ namespace RazorPad.UI.Editors.Folding
 
         bool HtmlSpansContainOffset(int offset)
         {
-            return spans.Any(span => IsInSpan(span, offset));
+            return htmlSpans.Any(span => IsInSpan(span, offset));
         }
 
         bool IsInSpan(Span span, int offset)
         {
             var spanOffset = span.Start.AbsoluteIndex;
             return (offset >= spanOffset) && (offset < spanOffset + span.Length);
+        }
+
+        bool IsTemplateParsed()
+        {
+            //return markupSpans != null;
+            return parserResults != null;
         }
     }
 }

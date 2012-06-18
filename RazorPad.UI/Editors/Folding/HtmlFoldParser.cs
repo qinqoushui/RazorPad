@@ -16,10 +16,10 @@ namespace RazorPad.UI.Editors.Folding
     {
         List<NewFolding> folds = new List<NewFolding>();
         Stack<HtmlElementFold> foldStack = new Stack<HtmlElementFold>();
-        HtmlReader htmlReader;
-        IHtmlReaderFactory htmlReaderFactory;
+        RazorHtmlReader razorHtmlReader;
+        IRazorHtmlReaderFactory htmlReaderFactory;
 
-        public HtmlFoldParser(IHtmlReaderFactory htmlReaderFactory)
+        public HtmlFoldParser(IRazorHtmlReaderFactory htmlReaderFactory)
         {
             this.htmlReaderFactory = htmlReaderFactory;
         }
@@ -27,14 +27,25 @@ namespace RazorPad.UI.Editors.Folding
         public IEnumerable<NewFolding> GetFolds(string html)
         {
             ClearPreviousFolds();
-            htmlReader = CreateHtmlReader(html);
-            while (htmlReader.Read())
+
+            razorHtmlReader = CreateHtmlReader(html);
+
+            GetHtmlFolds();
+            GetRazorFolds();
+
+            SortFoldsByStartOffset();
+            return folds;
+        }
+
+        private void GetHtmlFolds()
+        {
+            while (razorHtmlReader.Read())
             {
-                if (htmlReader.IsEmptyElement)
+                if (razorHtmlReader.IsEmptyElement)
                 {
                     // No folds for empty elements.
                 }
-                else if (htmlReader.IsEndElement)
+                else if (razorHtmlReader.IsEndElement)
                 {
                     AddFoldForCompletedElement();
                 }
@@ -43,38 +54,82 @@ namespace RazorPad.UI.Editors.Folding
                     SaveFoldStartOnStack();
                 }
             }
-
-            GetRazorFolds(html);
-            SortFoldsByStartOffset();
-            return folds;
         }
 
-        private void GetRazorFolds(string markup)
+        private void GetRazorFolds()
         {
-            var razorEngineHost = new RazorEngineHost(RazorCodeLanguage.GetLanguageByExtension("cshtml"));
-            var engine = new RazorTemplateEngine(razorEngineHost);
-            var results = engine.ParseTemplate(new StringReader(markup));
-            //var parser = new RazorParser(new CSharpCodeParser(), new HtmlMarkupParser());
-            //var results = parser.Parse(new StringReader(markup));
-            SaveRazorFoldsStartOnStack(results.Document.Children.Where(c => c.IsBlock));
+            SaveRazorFoldsStartOnStack(razorHtmlReader.CodeSpans);
+        }
+        
+        void ClearPreviousFolds()
+        {
+            folds.Clear();
+        }
+
+        RazorHtmlReader CreateHtmlReader(string html)
+        {
+           return htmlReaderFactory.CreateHtmlReader(html);
+        }
+
+        void SaveFoldStartOnStack()
+        {
+            var fold = new HtmlElementFold()
+                           {
+                               ElementName = razorHtmlReader.Value,
+                               StartOffset = razorHtmlReader.Offset,
+                               Line = razorHtmlReader.Line
+                           };
+            foldStack.Push(fold);
         }
 
         private void SaveRazorFoldsStartOnStack(IEnumerable<SyntaxTreeNode> nodes)
         {
             foreach (var syntaxTreeNode in nodes)
             {
-                var fold = new RazorElementFold()
+                folds.Add(new RazorElementFold
                 {
-                    ElementName = GetBlockName(syntaxTreeNode as Block),
+                    ElementName = RazorCodeSpanParser.GetBlockName(syntaxTreeNode as Block),
                     StartOffset = syntaxTreeNode.Start.AbsoluteIndex,
                     Line = syntaxTreeNode.Start.LineIndex,
                     EndOffset = syntaxTreeNode.Start.AbsoluteIndex + syntaxTreeNode.Length
-                };
+                });
+            }
+        }
+        
+        void AddFoldForCompletedElement()
+        {
+            if (foldStack.Any())
+            {
+                var fold = foldStack.Pop();
+                if (fold.ElementName == razorHtmlReader.Value)
+                {
+                    fold.EndOffset = razorHtmlReader.EndOffset;
+                    AddFoldIfEndElementOnDifferentLineToStartElement(fold);
+                }
+                else
+                {
+                    AddFoldForCompletedElement();
+                }
+            }
+        }
+
+        void AddFoldIfEndElementOnDifferentLineToStartElement(HtmlElementFold fold)
+        {
+            if (razorHtmlReader.Line > fold.Line)
+            {
                 folds.Add(fold);
             }
         }
 
-        private string GetBlockName(Block block)
+        void SortFoldsByStartOffset()
+        {
+            folds.Sort((fold1, fold2) => fold1.StartOffset.CompareTo(fold2.StartOffset));
+        }
+    }
+
+    public class RazorCodeSpanParser
+    {
+        public static string GetBlockName(Block block)
         {
             const string defaultName = "...";
             switch (block.Type)
@@ -88,84 +143,48 @@ namespace RazorPad.UI.Editors.Folding
                 case BlockType.Expression:
                     break;
                 case BlockType.Helper:
-                    var headerName = "";
-                    var helperHeader = block.Children.FirstOrDefault(c => c.GetType() == typeof(HelperHeaderSpan)) as HelperHeaderSpan;
-                    if (helperHeader != null)
-                    {
-                        headerName = helperHeader.Content.Substring(0, helperHeader.Content.IndexOf("(", StringComparison.Ordinal)).Trim();
-                    }
-                    return string.Format("@helper {0}", headerName);
+                    return GetHelperBlockName(block);
                 case BlockType.Markup:
                     break;
                 case BlockType.Section:
-                    var sectionName = "";
-                    if (block.Children != null)
-                    {
-                        var sectionHeader =
-                            block.Children.FirstOrDefault(c => c.GetType() == typeof(SectionHeaderSpan)) as SectionHeaderSpan;
-                        sectionName = sectionHeader != null ? sectionHeader.SectionName : "";
-                    }
-                    return string.Format("@section {0}", sectionName);
+                    return GetSectionBlockName(block);
                 case BlockType.Template:
                     break;
                 case BlockType.Comment:
-                    break;
+                    return GetCommentBlockName(block);
                 default:
                     return defaultName;
             }
             return defaultName;
         }
 
-
-        void ClearPreviousFolds()
+        private static string GetCommentBlockName(Block block)
         {
-            folds.Clear();
+            return "/* ... */";
         }
 
-        HtmlReader CreateHtmlReader(string html)
+        private static string GetSectionBlockName(Block block)
         {
-            return htmlReaderFactory.CreateHtmlReader(html);
-        }
-
-        void SaveFoldStartOnStack()
-        {
-            var fold = new HtmlElementFold()
-                           {
-                               ElementName = htmlReader.Value,
-                               StartOffset = htmlReader.Offset,
-                               Line = htmlReader.Line
-                           };
-            foldStack.Push(fold);
-        }
-
-        void AddFoldForCompletedElement()
-        {
-            if (foldStack.Any())
+            var sectionName = "";
+            if (block.Children != null)
             {
-                var fold = foldStack.Pop();
-                if (fold.ElementName == htmlReader.Value)
-                {
-                    fold.EndOffset = htmlReader.EndOffset;
-                    AddFoldIfEndElementOnDifferentLineToStartElement(fold);
-                }
-                else
-                {
-                    AddFoldForCompletedElement();
-                }
+                var sectionHeader =
+                    block.Children.FirstOrDefault(c => c.GetType() == typeof (SectionHeaderSpan)) as SectionHeaderSpan;
+                sectionName = sectionHeader != null ? sectionHeader.SectionName : "";
             }
+            return string.Format("@section {0}", sectionName);
         }
 
-        void AddFoldIfEndElementOnDifferentLineToStartElement(HtmlElementFold fold)
+        private static string GetHelperBlockName(Block block)
         {
-            if (htmlReader.Line > fold.Line)
+            var headerName = "";
+            var helperHeader = block.Children.FirstOrDefault(c => c.GetType() == typeof (HelperHeaderSpan)) as HelperHeaderSpan;
+            if (helperHeader != null)
             {
-                folds.Add(fold);
+                headerName =
+                    helperHeader.Content.Substring(0, helperHeader.Content.IndexOf("(", StringComparison.Ordinal)).Trim();
             }
-        }
-
-        void SortFoldsByStartOffset()
-        {
-            folds.Sort((fold1, fold2) => fold1.StartOffset.CompareTo(fold2.StartOffset));
+            return string.Format("@helper {0}", headerName);
         }
     }
 }
