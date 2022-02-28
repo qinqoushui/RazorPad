@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "511d144c-f4c7-40a3-b3b4-80d891fce2f5": {
+      "ProjectGuid": "511d144c-f4c7-40a3-b3b4-80d891fce2f5",
+      "DisplayName": "RazorPad.Core",
+      "ColorIndex": 0
+    },
+    "a635596e-2215-4fef-bc10-92f63eaaaa97": {
+      "ProjectGuid": "a635596e-2215-4fef-bc10-92f63eaaaa97",
+      "DisplayName": "RazorPad.UI.Application",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}
