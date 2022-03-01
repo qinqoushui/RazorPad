@@ -136,7 +136,7 @@ namespace RazorPad.Views
 
             if (referencesUpdated == true)
             {
-                var selectedReferences = dialogDataContext.InstalledReferences.References;
+                var selectedReferences = dialogDataContext.InstalledReferences.References.Where(r=>r.IsInstalled).ToList();
                 references = selectedReferences.Select(reference => reference.Location).ToArray();
 
                 var recentReferences =

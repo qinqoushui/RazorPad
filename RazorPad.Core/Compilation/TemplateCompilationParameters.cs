@@ -15,7 +15,15 @@ namespace RazorPad.Compilation
     {
         public static TemplateCompilationParameters CSharp
         {
-            get { return new TemplateCompilationParameters(new CSharpRazorCodeLanguage(), new CSharpCodeProvider()); }
+            get
+            {
+                //
+              //  CodeDomProvider objCodeCompiler = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.
+                return new TemplateCompilationParameters(new CSharpRazorCodeLanguage(), new CSharpCodeProvider(new Dictionary<string, string>()
+                {
+                    ["CompilerVersion"] = "v4.0"
+                }));
+            }
         }
 
         public static TemplateCompilationParameters VisualBasic
@@ -76,6 +84,6 @@ namespace RazorPad.Compilation
 
             return CSharp;
         }
-		
-	}
+
+    }
 }

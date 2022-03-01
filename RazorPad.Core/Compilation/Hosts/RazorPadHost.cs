@@ -13,46 +13,51 @@ namespace RazorPad.Compilation.Hosts
     public class RazorPadHost : RazorEngineHost
     {
         private static readonly ISet<string> GlobalImports = new HashSet<string>();
-    	private static readonly Assembly[] _defaultIncludes = new[] {
-    			                         	typeof(TemplateBase).Assembly,
-    			                         	typeof(DynamicAttribute).Assembly,
-    			                         	typeof(INotifyPropertyChanged).Assembly,
-    			                         	typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly,
-    			                         };
+        private static readonly Assembly[] _defaultIncludes = new[] {
+                                             typeof(TemplateBase).Assembly,
+                                             typeof(DynamicAttribute).Assembly,
+                                             typeof(INotifyPropertyChanged).Assembly,
+                                             typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly,
+                                         };
 
-    	public static IEnumerable<Assembly> DefaultIncludes
-    	{
-    		get { return _defaultIncludes; }
-    	}
+        public static IEnumerable<Assembly> DefaultIncludes
+        {
+            get { return _defaultIncludes; }
+        }
 
 
         public RazorPadHost(RazorCodeLanguage language = null)
         {
-            
-// ReSharper disable DoNotCallOverridableMethodsInConstructor
+
+            // ReSharper disable DoNotCallOverridableMethodsInConstructor
             DefaultBaseClass = typeof(TemplateBase).FullName;
             DefaultClassName = "CompiledTemplate";
             DefaultNamespace = "RazorPad.Runtime";
             CodeLanguage = language;
             GeneratedClassContext = new GeneratedClassContext(
-                GeneratedClassContext.DefaultExecuteMethodName, 
+                GeneratedClassContext.DefaultExecuteMethodName,
                 GeneratedClassContext.DefaultWriteMethodName,
                 GeneratedClassContext.DefaultWriteLiteralMethodName,
-                "WriteTo", "WriteLiteralTo", 
+                "WriteTo", "WriteLiteralTo",
                 typeof(HelperResult).FullName);
-// ReSharper restore DoNotCallOverridableMethodsInConstructor
+            // ReSharper restore DoNotCallOverridableMethodsInConstructor
         }
 
-        public override MarkupParser CreateMarkupParser()
+        public override ParserBase CreateMarkupParser()
         {
             return new HtmlMarkupParser();
         }
+        //public override HtmlMarkupParser CreateMarkupParser()
+        //{
+        //    return new HtmlMarkupParser();
+        //}
 
         public override RazorCodeGenerator DecorateCodeGenerator(RazorCodeGenerator incomingCodeGenerator)
         {
             if (incomingCodeGenerator is CSharpRazorCodeGenerator)
             {
-                return new ViewComponentCSharpRazorCodeGenerator(incomingCodeGenerator.ClassName, incomingCodeGenerator.RootNamespaceName, incomingCodeGenerator.SourceFileName, incomingCodeGenerator.Host);
+                return new CSharpRazorCodeGenerator(incomingCodeGenerator.ClassName, incomingCodeGenerator.RootNamespaceName, incomingCodeGenerator.SourceFileName, incomingCodeGenerator.Host);
+                //return new ViewComponentCSharpRazorCodeGenerator(incomingCodeGenerator.ClassName, incomingCodeGenerator.RootNamespaceName, incomingCodeGenerator.SourceFileName, incomingCodeGenerator.Host);
             }
             if (incomingCodeGenerator is VBRazorCodeGenerator)
             {
@@ -72,13 +77,19 @@ namespace RazorPad.Compilation.Hosts
             return base.DecorateCodeParser(incomingCodeParser);
         }
 
-        public override void PostProcessGeneratedCode(CodeCompileUnit codeCompileUnit, CodeNamespace generatedNamespace, CodeTypeDeclaration generatedClass, CodeMemberMethod executeMethod)
+        public override void PostProcessGeneratedCode(CodeGeneratorContext context)
         {
-            base.PostProcessGeneratedCode(codeCompileUnit, generatedNamespace, generatedClass, executeMethod);
-
-            AddAssemblyReferences(codeCompileUnit);
-            AddNamespaceImports(generatedNamespace);
+            base.PostProcessGeneratedCode(context);
+            AddAssemblyReferences(context.CompileUnit);
+            AddNamespaceImports(context.Namespace);
         }
+        //public override void PostProcessGeneratedCode(CodeCompileUnit codeCompileUnit, CodeNamespace generatedNamespace, CodeTypeDeclaration generatedClass, CodeMemberMethod executeMethod)
+        //{
+        //    base.PostProcessGeneratedCode(codeCompileUnit, generatedNamespace, generatedClass, executeMethod);
+
+        //    AddAssemblyReferences(codeCompileUnit);
+        //    AddNamespaceImports(generatedNamespace);
+        //}
 
 
         protected virtual void AddAssemblyReferences(CodeCompileUnit codeCompileUnit)
@@ -89,7 +100,7 @@ namespace RazorPad.Compilation.Hosts
 
         protected virtual void AddNamespaceImports(CodeNamespace generatedNamespace)
         {
-            var namespaces = new List<string> {"System"};
+            var namespaces = new List<string> { "System" };
 
             // Import the globally-defined imports
             namespaces.AddRange(GetGlobalImports());

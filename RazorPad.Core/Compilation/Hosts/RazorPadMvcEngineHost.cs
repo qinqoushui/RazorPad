@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Web.Razor;
+using System.Web.Razor.Generator;
 
 namespace RazorPad.Compilation.Hosts
 {
@@ -18,23 +19,30 @@ namespace RazorPad.Compilation.Hosts
             // ReSharper restore DoNotCallOverridableMethodsInConstructor
         }
 
-        public override void PostProcessGeneratedCode(CodeCompileUnit codeCompileUnit, CodeNamespace generatedNamespace, CodeTypeDeclaration generatedClass, CodeMemberMethod executeMethod)
+        public override void PostProcessGeneratedCode(CodeGeneratorContext context)
         {
-            base.PostProcessGeneratedCode(codeCompileUnit, generatedNamespace, generatedClass, executeMethod);
-
-            AddGlobalApplicationClassToCompiledPage(codeCompileUnit);
-
-            AddAssemblyReferences(codeCompileUnit);
+            base.PostProcessGeneratedCode(context);
+            AddGlobalApplicationClassToCompiledPage(context.CompileUnit);
+            AddAssemblyReferences(context.CompileUnit);
         }
+
+        //public override void PostProcessGeneratedCode(CodeCompileUnit codeCompileUnit, CodeNamespace generatedNamespace, CodeTypeDeclaration generatedClass, CodeMemberMethod executeMethod)
+        //{
+        //    base.PostProcessGeneratedCode(codeCompileUnit, generatedNamespace, generatedClass, executeMethod);
+
+        //    AddGlobalApplicationClassToCompiledPage(codeCompileUnit);
+
+        //    AddAssemblyReferences(codeCompileUnit);
+        //}
 
         protected virtual void AddAssemblyReferences(CodeCompileUnit codeCompileUnit)
         {
             IEnumerable<string> referencedAssemblies =
                 new[] { // .NET Framework Assemblies (by name)
-                    "System.dll", 
-                    "System.Core.dll", 
-                    "System.Net.dll", 
-                    "System.Web.dll", 
+                    "System.dll",
+                    "System.Core.dll",
+                    "System.Net.dll",
+                    "System.Web.dll",
                     "Microsoft.CSharp.dll", // For dynamic stuff
                 }
                 // "Third party" assemblies (by location)

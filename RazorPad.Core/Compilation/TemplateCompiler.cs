@@ -46,6 +46,7 @@ namespace RazorPad.Compilation
                                            BlankLinesBetweenMembers = false,
                                            BracingStyle = "C"
                                        };
+            
         }
 
 

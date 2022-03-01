@@ -33,7 +33,7 @@ namespace RazorPad.ViewModels
             InstalledReferences = new SearchableReferencesViewModel(allReferences.Where(r => r.IsInstalled));
         }
 
-
+       
 
         void StandardReferences_ListChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -116,5 +116,6 @@ namespace RazorPad.ViewModels
                 
             return true;
         }
+
     }
 }

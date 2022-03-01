@@ -130,7 +130,10 @@ namespace RazorPad.UI.Editors
             foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
 
             var foldingUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-            foldingUpdateTimer.Tick += (o, args) => foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
+            foldingUpdateTimer.Tick += (o, args) =>
+            {
+                foldingStrategy.UpdateFoldings(foldingManager, Editor.Document);
+            };
 
             foldingUpdateTimer.Start();
 
