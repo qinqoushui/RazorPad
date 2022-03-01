@@ -144,7 +144,7 @@ namespace RazorPad.Views
                         .Distinct()
                         .Take(50)
                         .Select(r => r.Location);
-
+                
                 ViewModel.SetRecentReferences(recentReferences);
             }
 
